@@ -9,7 +9,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "updates": {
-      "url": "https://u.expo.dev/34ca9c08-4872-4167-a9cf-9ef543863a9b"
+      "url": "https://u.expo.dev/34ca9c08-4872-4167-a9cf-9ef543863a9b",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "runtimeVersion": {
       "policy": "appVersion"
