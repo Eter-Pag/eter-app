@@ -8,9 +8,10 @@ interface GlassCardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   intensity?: number;
+  noPadding?: boolean;
 }
 
-export function GlassCard({ children, style, intensity = 30 }: GlassCardProps) {
+export function GlassCard({ children, style, intensity = 30, noPadding = false }: GlassCardProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const t = Colors[colorScheme];
 
@@ -21,7 +22,7 @@ export function GlassCard({ children, style, intensity = 30 }: GlassCardProps) {
         tint={colorScheme === 'dark' ? 'dark' : 'light'}
         style={StyleSheet.absoluteFill}
       />
-      <View style={[styles.content, { backgroundColor: t.cardBackground }]}>
+      <View style={[styles.content, noPadding && { padding: 0 }, { backgroundColor: t.cardBackground }]}>
         {children}
       </View>
     </View>
@@ -51,5 +52,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     width: '100%',
+    height: '100%',
   },
 });

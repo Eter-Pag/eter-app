@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Linking, ScrollView, StyleSheet, TouchableOpacity, View, Dimensions, Platform } from 'react-native';
+import { Linking, ScrollView, StyleSheet, TouchableOpacity, View, Dimensions, Platform, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -31,6 +31,19 @@ export default function TabTwoScreen() {
     { title: "Zona VIP", image: imgSubscriptores, icon: "star-outline", color: "#8B5CF6", url: "https://eter-production-f148.up.railway.app/suscriptores" },
   ];
 
+  const handleOpenURL = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported || Platform.OS === 'web') {
+        await Linking.openURL(url);
+      } else {
+        console.warn("No se puede abrir la URL: " + url);
+      }
+    } catch (error) {
+      console.error("Error al abrir URL:", error);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: t.background }]}>
       <LinearGradient colors={['#1a1a2e', '#0d0d1a']} style={StyleSheet.absoluteFill} />
@@ -52,15 +65,16 @@ export default function TabTwoScreen() {
               style={styles.cardWrapper}
             >
               <TouchableOpacity 
-                activeOpacity={0.8} 
-                onPress={() => Linking.openURL(tool.url)}
+                activeOpacity={0.7} 
+                onPress={() => handleOpenURL(tool.url)}
+                style={styles.touchable}
               >
-                <GlassCard style={styles.card}>
+                <GlassCard style={styles.card} intensity={40} noPadding>
                   <Image source={tool.image} style={styles.cardImage} contentFit="cover" />
-                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.cardOverlay} />
+                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={styles.cardOverlay} />
                   <View style={styles.cardContent}>
-                    <View style={[styles.iconContainer, { backgroundColor: tool.color + '40' }]}>
-                      <Ionicons name={tool.icon as any} size={20} color={tool.color} />
+                    <View style={[styles.iconContainer, { backgroundColor: tool.color + '50' }]}>
+                      <Ionicons name={tool.icon as any} size={22} color={tool.color} />
                     </View>
                     <Text style={styles.cardTitle}>{tool.title}</Text>
                   </View>
@@ -80,7 +94,7 @@ export default function TabTwoScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 100 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 120 },
   title: { fontSize: 32, fontWeight: '900', color: '#fff', letterSpacing: 4 },
   subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '600', marginBottom: 30, letterSpacing: 1 },
   gridContainer: {
@@ -91,15 +105,19 @@ const styles = StyleSheet.create({
   },
   cardWrapper: {
     width: (width - 55) / 2,
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  touchable: {
+    width: '100%',
+    height: 180,
   },
   card: {
-    height: 180,
-    padding: 0,
+    flex: 1,
+    borderRadius: 24,
   },
   cardImage: {
     ...StyleSheet.absoluteFillObject,
-    opacity: 0.6,
+    opacity: 0.7,
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -107,19 +125,19 @@ const styles = StyleSheet.create({
   cardContent: {
     flex: 1,
     justifyContent: 'flex-end',
-    padding: 15,
+    padding: 16,
   },
   iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#fff',
     letterSpacing: 0.5,
   },
