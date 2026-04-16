@@ -140,6 +140,10 @@ export default function Calendario() {
       const uri = result.assets[0].uri;
       const nuevosFondos = { ...fondosPersonalizados, [mesAjusteFondo]: uri };
       setFondosPersonalizados(nuevosFondos);
+      // Resetear el estado de fallo para este mes si se sube una nueva
+      const nuevosFallos = { ...fondoFallo };
+      delete nuevosFallos[mesAjusteFondo];
+      setFondoFallo(nuevosFallos);
       await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
     }
   };
@@ -148,6 +152,10 @@ export default function Calendario() {
     const nuevosFondos = { ...fondosPersonalizados };
     delete nuevosFondos[mesAjusteFondo];
     setFondosPersonalizados(nuevosFondos);
+    // Limpiar también el estado de fallo
+    const nuevosFallos = { ...fondoFallo };
+    delete nuevosFallos[mesAjusteFondo];
+    setFondoFallo(nuevosFallos);
     await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
   };
 
@@ -176,12 +184,30 @@ export default function Calendario() {
 
   const fechaBTS = (d: number) => FECHAS_BTS.find(f => f.mes === mes && f.dia === d);
   
-  const imagenFondoActual = fondosPersonalizados[mes] ? { uri: fondosPersonalizados[mes] } : IMAGENES_DEFAULT[mes];
-  const imagenPreviewAjuste = fondosPersonalizados[mesAjusteFondo] ? { uri: fondosPersonalizados[mesAjusteFondo] } : IMAGENES_DEFAULT[mesAjusteFondo];
+  // Lógica de respaldo: Si la imagen personalizada falla, se usa la de BTS por defecto
+  const [fondoFallo, setFondoFallo] = useState<any>({});
+
+  const getImagenFondo = (m: number) => {
+    if (fondosPersonalizados[m] && !fondoFallo[m]) {
+      return { uri: fondosPersonalizados[m] };
+    }
+    return IMAGENES_DEFAULT[m];
+  };
+
+  const imagenFondoActual = getImagenFondo(mes);
+  const imagenPreviewAjuste = getImagenFondo(mesAjusteFondo);
   
   return (
     <View style={[s.container, { backgroundColor: t.background }]}>
-      <Image source={imagenFondoActual} style={s.bgImage} />
+      <Image 
+        source={imagenFondoActual} 
+        style={s.bgImage} 
+        onError={() => {
+          if (fondosPersonalizados[mes]) {
+            setFondoFallo({ ...fondoFallo, [mes]: true });
+          }
+        }}
+      />
       <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
       {!uiVisible && (
