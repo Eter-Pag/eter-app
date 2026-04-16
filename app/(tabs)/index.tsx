@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { GlassCard } from '@/components/GlassCard';
 import { WeatherWidget } from '@/components/WeatherWidget';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -48,24 +48,61 @@ const FECHAS_BTS = [
 ];
 
 const STORAGE_KEY = '@bts_eventos';
+const STORAGE_TEMA = '@bts_tema';
+
+const TEMAS_PERSONALIZADOS = {
+  morado: { accent: '#9b59b6', bg: 'rgba(155, 89, 182, 0.3)' },
+  rosa: { accent: '#ec407a', bg: 'rgba(236, 64, 122, 0.3)' },
+  azul: { accent: '#3b82f6', bg: 'rgba(59, 130, 246, 0.3)' },
+};
 
 export default function Calendario() {
-  const colorScheme = useColorScheme() ?? 'dark';
+  const systemColorScheme = useColorScheme() ?? 'dark';
+  const [temaManual, setTemaManual] = useState<string | null>(null);
+  const colorScheme = (temaManual === 'oscuro' ? 'dark' : (temaManual === 'claro' ? 'light' : systemColorScheme)) as 'light' | 'dark';
   const t = Colors[colorScheme];
+  
   const hoy = new Date();
   const [mes, setMes] = useState(hoy.getMonth());
   const [anio, setAnio] = useState(hoy.getFullYear());
-  const [eventos, setEventos] = useState({});
+  const [eventos, setEventos] = useState<any>({});
+  const [accentColor, setAccentColor] = useState('#9b59b6');
+  
+  // Modales
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [modalEventoVisible, setModalEventoVisible] = useState(false);
+  const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
+  const [nuevoEventoTexto, setNuevoEventoTexto] = useState('');
 
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         const eventosGuardados = await AsyncStorage.getItem(STORAGE_KEY);
         if (eventosGuardados) setEventos(JSON.parse(eventosGuardados));
+        const temaGuardado = await AsyncStorage.getItem(STORAGE_TEMA);
+        if (temaGuardado) {
+            const parsed = JSON.parse(temaGuardado);
+            setAccentColor(parsed.accent || '#9b59b6');
+        }
       } catch (e) { console.log('Error cargando datos:', e); }
     };
     cargarDatos();
   }, []);
+
+  const guardarEvento = async () => {
+    if (!diaSeleccionado || !nuevoEventoTexto.trim()) return;
+    const clave = `${anio}-${mes}-${diaSeleccionado}`;
+    const nuevosEventos = { ...eventos, [clave]: [...(eventos[clave] || []), nuevoEventoTexto] };
+    setEventos(nuevosEventos);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nuevosEventos));
+    setNuevoEventoTexto('');
+    setModalEventoVisible(false);
+  };
+
+  const cambiarTema = async (color: string) => {
+    setAccentColor(color);
+    await AsyncStorage.setItem(STORAGE_TEMA, JSON.stringify({ accent: color }));
+  };
 
   const diasEnMes = new Date(anio, mes + 1, 0).getDate();
   const primerDia = new Date(anio, mes, 1).getDay();
@@ -81,8 +118,9 @@ export default function Calendario() {
   
   return (
     <View style={[s.container, { backgroundColor: t.background }]}>
-      <Image source={IMAGENES[mes]} style={s.bgImage} blurRadius={Platform.OS === 'ios' ? 0 : 2} />
-      <LinearGradient colors={['rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
+      <Image source={IMAGENES[mes]} style={s.bgImage} />
+      {/* Gradiente más suave arriba para ver mejor la imagen */}
+      <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.4)', t.background]} style={s.overlay} />
       
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
         <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
@@ -90,15 +128,20 @@ export default function Calendario() {
             <Text style={s.titleText}>BTS CALENDAR</Text>
             <Text style={s.koreanText}>방탄소년단 • 2026 Edition</Text>
           </View>
-          <TouchableOpacity style={s.profileBtn}>
-             <Ionicons name="person-circle-outline" size={32} color="#fff" />
-          </TouchableOpacity>
+          <View style={s.headerBtns}>
+              <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
+                 <Ionicons name="settings-outline" size={24} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity style={s.iconBtn}>
+                 <Ionicons name="person-circle-outline" size={32} color="#fff" />
+              </TouchableOpacity>
+          </View>
         </Animated.View>
 
         <WeatherWidget />
 
         <Animated.View entering={FadeInDown.delay(200).duration(800)}>
-          <GlassCard style={s.calendarCard}>
+          <GlassCard style={s.calendarCard} intensity={25}>
             <View style={s.navRow}>
               <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
                 <Ionicons name="chevron-back" size={24} color="#fff" />
@@ -117,21 +160,30 @@ export default function Calendario() {
               {celdas.map((dia, i) => {
                 const esBTS = dia && !!fechaBTS(dia);
                 const esHoy = dia === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear();
+                const clave = `${anio}-${mes}-${dia}`;
+                const tieneEvento = dia && eventos[clave]?.length > 0;
                 
                 return (
                   <TouchableOpacity 
                     key={i} 
                     disabled={!dia}
+                    onPress={() => {
+                        if (dia) {
+                            setDiaSeleccionado(dia);
+                            setModalEventoVisible(true);
+                        }
+                    }}
                     style={[
                       s.celda, 
-                      esHoy && s.celdaHoy,
-                      esBTS && s.celdaBTS
+                      esHoy && { backgroundColor: accentColor + '99', borderColor: '#fff', borderWidth: 1 },
+                      (esBTS || tieneEvento) && { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
                     ]} 
                   >
                     <Text style={[s.diaNum, { color: dia ? '#fff' : 'transparent' }, esHoy && { fontWeight: 'bold' }]}>
                       {dia || ''}
                     </Text>
-                    {esBTS && <View style={s.btsIndicator} />}
+                    {esBTS && <View style={[s.btsIndicator, { backgroundColor: accentColor }]} />}
+                    {tieneEvento && <View style={s.eventIndicator} />}
                   </TouchableOpacity>
                 );
               })}
@@ -140,11 +192,12 @@ export default function Calendario() {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
-           <Text style={s.sectionTitle}>Eventos Especiales</Text>
+           <Text style={s.sectionTitle}>Eventos del Mes</Text>
+           {/* Eventos Oficiales BTS */}
            {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
-             <GlassCard key={i} style={s.eventItem}>
+             <GlassCard key={`bts-${i}`} style={s.eventItem} intensity={20}>
                 <View style={s.eventContent}>
-                  <View style={s.eventIcon}>
+                  <View style={[s.eventIcon, { backgroundColor: accentColor + '33' }]}>
                     <Text style={{fontSize: 20}}>💜</Text>
                   </View>
                   <View>
@@ -154,8 +207,86 @@ export default function Calendario() {
                 </View>
              </GlassCard>
            ))}
+           {/* Eventos Personalizados */}
+           {Object.keys(eventos).filter(k => k.startsWith(`${anio}-${mes}-`)).map((k, i) => {
+               const dia = k.split('-')[2];
+               return eventos[k].map((txt: string, idx: number) => (
+                <GlassCard key={`user-${i}-${idx}`} style={s.eventItem} intensity={20}>
+                    <View style={s.eventContent}>
+                    <View style={[s.eventIcon, { backgroundColor: 'rgba(255,255,255,0.1)' }]}>
+                        <Ionicons name="calendar-outline" size={20} color="#fff" />
+                    </View>
+                    <View>
+                        <Text style={s.eventText}>{txt}</Text>
+                        <Text style={s.eventDate}>{dia} de {MESES[mes]}</Text>
+                    </View>
+                    </View>
+                </GlassCard>
+               ));
+           })}
         </Animated.View>
       </ScrollView>
+
+      {/* Modal de Ajustes */}
+      <Modal visible={menuVisible} transparent animationType="fade">
+        <View style={s.modalOverlay}>
+            <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setMenuVisible(false)} />
+            <Animated.View entering={FadeIn.duration(300)} style={s.modalContainer}>
+                <GlassCard style={s.modalCard} intensity={50}>
+                    <Text style={s.modalTitle}>AJUSTES</Text>
+                    
+                    <Text style={s.modalSub}>Temas de Color</Text>
+                    <View style={s.themeRow}>
+                        {Object.entries(TEMAS_PERSONALIZADOS).map(([name, theme]) => (
+                            <TouchableOpacity 
+                                key={name} 
+                                style={[s.themeCircle, { backgroundColor: theme.accent }]} 
+                                onPress={() => cambiarTema(theme.accent)}
+                            >
+                                {accentColor === theme.accent && <Ionicons name="checkmark" size={20} color="#fff" />}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <TouchableOpacity style={s.closeBtn} onPress={() => setMenuVisible(false)}>
+                        <Text style={s.closeBtnText}>CERRAR</Text>
+                    </TouchableOpacity>
+                </GlassCard>
+            </Animated.View>
+        </View>
+      </Modal>
+
+      {/* Modal Nuevo Evento */}
+      <Modal visible={modalEventoVisible} transparent animationType="slide">
+        <View style={s.modalOverlay}>
+            <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setModalEventoVisible(false)} />
+            <View style={s.modalBottomContainer}>
+                <GlassCard style={s.modalCard} intensity={60}>
+                    <Text style={s.modalTitle}>NUEVO EVENTO</Text>
+                    <Text style={s.modalSub}>{diaSeleccionado} de {MESES[mes]}</Text>
+                    
+                    <TextInput 
+                        style={s.input}
+                        placeholder="Nombre del evento..."
+                        placeholderTextColor="rgba(255,255,255,0.4)"
+                        value={nuevoEventoTexto}
+                        onChangeText={setNuevoEventoTexto}
+                        autoFocus
+                    />
+
+                    <View style={s.modalBtnRow}>
+                        <TouchableOpacity style={[s.actionBtn, { backgroundColor: accentColor }]} onPress={guardarEvento}>
+                            <Text style={s.actionBtnText}>GUARDAR</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={s.cancelBtn} onPress={() => setModalEventoVisible(false)}>
+                            <Text style={s.cancelBtnText}>CANCELAR</Text>
+                        </TouchableOpacity>
+                    </View>
+                </GlassCard>
+            </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
@@ -164,12 +295,13 @@ const s = StyleSheet.create({
   container: { flex: 1 },
   bgImage: { position: 'absolute', width: width, height: height, resizeMode: 'cover' },
   overlay: { ...StyleSheet.absoluteFillObject },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100 },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 120 },
   
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
+  headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  iconBtn: { padding: 5 },
   titleText: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 2 },
   koreanText: { fontSize: 14, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
-  profileBtn: { padding: 4 },
 
   calendarCard: { marginBottom: 25, paddingVertical: 10 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 10 },
@@ -181,16 +313,37 @@ const s = StyleSheet.create({
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   celda: { width: (width - 100) / 7, height: 45, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  celdaHoy: { backgroundColor: 'rgba(155, 89, 182, 0.6)', borderWidth: 1, borderColor: '#fff' },
-  celdaBTS: { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
   diaNum: { fontSize: 15 },
-  btsIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#d7bde2', marginTop: 2 },
+  btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
+  eventIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#fff', marginTop: 2, position: 'absolute', bottom: 5 },
 
   eventsSection: { marginTop: 10 },
   sectionTitle: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 15, marginLeft: 5 },
   eventItem: { marginBottom: 12 },
   eventContent: { flexDirection: 'row', alignItems: 'center', gap: 15 },
-  eventIcon: { width: 45, height: 45, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  eventIcon: { width: 45, height: 45, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   eventText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   eventDate: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 2 },
+
+  // Modales
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContainer: { width: '100%', maxWidth: 400 },
+  modalBottomContainer: { width: '100%', maxWidth: 400, position: 'absolute', bottom: 40 },
+  modalCard: { padding: 25, alignItems: 'center' },
+  modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 10, letterSpacing: 2 },
+  modalSub: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginBottom: 20 },
+  
+  themeRow: { flexDirection: 'row', gap: 20, marginBottom: 30 },
+  themeCircle: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },
+  
+  input: { width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 15, padding: 15, color: '#fff', fontSize: 16, marginBottom: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  
+  modalBtnRow: { flexDirection: 'row', gap: 15, width: '100%' },
+  actionBtn: { flex: 1, height: 50, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  actionBtnText: { color: '#fff', fontWeight: '900', letterSpacing: 1 },
+  cancelBtn: { flex: 1, height: 50, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  cancelBtnText: { color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
+  
+  closeBtn: { width: '100%', height: 50, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { color: '#fff', fontWeight: '900', letterSpacing: 1 },
 });
