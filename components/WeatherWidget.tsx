@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import { GlassCard } from './GlassCard';
+import { StyleSheet, View, Text, ActivityIndicator, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FadeIn } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
@@ -17,12 +16,9 @@ export function WeatherWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchWeather() {
+    async function fetchWeather(lat: number, lon: number, locationName: string = "Tu Ubicación") {
       try {
-        const lat = 19.4326;
-        const lon = -99.1332;
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-        
         const response = await fetch(url);
         const data = await response.json();
         
@@ -40,7 +36,7 @@ export function WeatherWidget() {
           temp: Math.round(data.current_weather.temperature),
           condition: condition,
           icon: icon,
-          location: "CDMX, MX"
+          location: locationName
         });
       } catch (error) {
         console.error("Weather fetch error:", error);
@@ -49,13 +45,27 @@ export function WeatherWidget() {
       }
     }
 
-    fetchWeather();
+    // Intentar obtener geolocalización (solo funciona si el usuario da permiso)
+    if (Platform.OS === 'web' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetchWeather(position.coords.latitude, position.coords.longitude, "Tu Ciudad");
+        },
+        () => {
+          // Fallback a CDMX si no hay permiso
+          fetchWeather(19.4326, -99.1332, "CDMX, MX");
+        }
+      );
+    } else {
+      // Fallback a CDMX para otros entornos o si no está disponible
+      fetchWeather(19.4326, -99.1332, "CDMX, MX");
+    }
   }, []);
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="rgba(255,255,255,0.3)" size="small" />
+        <ActivityIndicator color="rgba(255,255,255,0.8)" size="small" />
       </View>
     );
   }
@@ -64,7 +74,8 @@ export function WeatherWidget() {
 
   return (
     <Animated.View entering={FadeIn.duration(1000)}>
-      <GlassCard style={styles.container} intensity={5}>
+      {/* Contenedor con opacidad al 1% (casi nulo) */}
+      <View style={styles.container}>
         <View style={styles.content}>
           <View style={styles.leftInfo}>
             <Text style={styles.location}>{weather.location}</Text>
@@ -72,10 +83,11 @@ export function WeatherWidget() {
             <Text style={styles.condition}>{weather.condition}</Text>
           </View>
           <View style={styles.iconContainer}>
-            <Ionicons name={weather.icon} size={36} color="rgba(255,255,255,0.4)" />
+            {/* Icono al 100% de opacidad */}
+            <Ionicons name={weather.icon} size={42} color="rgba(255,255,255,1)" />
           </View>
         </View>
-      </GlassCard>
+      </View>
     </Animated.View>
   );
 }
@@ -88,42 +100,43 @@ const styles = StyleSheet.create({
   },
   container: {
     marginBottom: 15,
-    backgroundColor: 'rgba(255,255,255,0.01)', // 1% de fondo para ser casi nulo
-    borderColor: 'rgba(255,255,255,0.03)',
-    padding: 8,
+    backgroundColor: 'rgba(255,255,255,0.01)', // 1% de fondo (casi invisible)
+    borderColor: 'rgba(255,255,255,0.02)',
+    borderWidth: 1,
+    borderRadius: 20,
+    padding: 10,
   },
   content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 0,
   },
   leftInfo: {
     flex: 1,
   },
   location: {
-    color: 'rgba(255,255,255,0.25)',
-    fontSize: 9,
-    fontWeight: '700',
+    color: 'rgba(255,255,255,0.6)', // Muy visible
+    fontSize: 11,
+    fontWeight: '800',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
   temp: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 24,
+    color: 'rgba(255,255,255,1)', // 100% Visible
+    fontSize: 36,
     fontWeight: '900',
     marginVertical: -2,
   },
   condition: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 10,
-    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)', // Muy visible
+    fontSize: 13,
+    fontWeight: '700',
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    width: 50,
+    height: 50,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
     justifyContent: 'center',
   },
