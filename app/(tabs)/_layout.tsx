@@ -36,11 +36,11 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '700',
-          marginBottom: Platform.OS === 'ios' ? -5 : 10, // Adjust label position
+          marginBottom: Platform.OS === 'ios' ? -5 : 10,
           letterSpacing: 0.5,
         },
         tabBarIconStyle: {
-            marginTop: Platform.OS === 'ios' ? 10 : 0, // Adjust icon position
+            marginTop: Platform.OS === 'ios' ? 10 : 0,
         }
       }}
     >
@@ -50,6 +50,15 @@ export default function TabLayout() {
           title: 'CALENDARIO',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="proximas"
+        options={{
+          title: 'PRÓXIMAS',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'time' : 'time-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -70,7 +79,7 @@ const styles = StyleSheet.create({
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
-    backgroundColor: 'rgba(20, 20, 35, 0.6)', // Fallback color
+    backgroundColor: 'rgba(20, 20, 35, 0.6)',
   },
   tabBarBorder: {
     position: 'absolute',

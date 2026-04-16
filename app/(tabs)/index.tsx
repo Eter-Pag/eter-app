@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -104,42 +104,11 @@ export default function Calendario() {
     cargarDatos();
   }, []);
 
-  // Sincronizar mesAjusteFondo con el mes actual del calendario cuando se abre el menú
   useEffect(() => {
     if (menuVisible) {
       setMesAjusteFondo(mes);
     }
   }, [menuVisible, mes]);
-
-  // Lógica para calcular las próximas fechas ordenadas
-  const proximasFechas = useMemo(() => {
-    const todasLasFechas: any[] = [];
-    const anioActual = new Date().getFullYear();
-
-    // Añadir fechas de BTS
-    FECHAS_BTS.forEach(f => {
-      let fechaObj = new Date(anioActual, f.mes, f.dia);
-      // Si la fecha ya pasó este año, ponerla para el próximo año para el orden
-      if (fechaObj < hoy && (fechaObj.getDate() !== hoy.getDate() || fechaObj.getMonth() !== hoy.getMonth())) {
-        fechaObj = new Date(anioActual + 1, f.mes, f.dia);
-      }
-      todasLasFechas.push({ ...f, date: fechaObj, esBTS: true });
-    });
-
-    // Añadir eventos personalizados
-    Object.keys(eventos).forEach(clave => {
-      const [a, m, d] = clave.split('-').map(Number);
-      const fechaObj = new Date(a, m, d);
-      if (fechaObj >= hoy || (fechaObj.getDate() === hoy.getDate() && fechaObj.getMonth() === hoy.getMonth())) {
-        eventos[clave].forEach((texto: string) => {
-          todasLasFechas.push({ mes: m, dia: d, texto, date: fechaObj, esBTS: false });
-        });
-      }
-    });
-
-    // Ordenar por fecha más cercana
-    return todasLasFechas.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 5);
-  }, [eventos, hoy]);
 
   const guardarConfig = async (nuevaConfig: any) => {
     try {
@@ -309,23 +278,7 @@ export default function Calendario() {
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Nueva Sección: PRÓXIMAS FECHAS */}
-            <Animated.View entering={FadeInDown.delay(300).duration(800)} style={s.upcomingSection}>
-               <Text style={[s.sectionTitle, { color: colorInterfaz }]}>Próximas Fechas</Text>
-               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.upcomingScroll}>
-                 {proximasFechas.map((f, i) => (
-                   <GlassCard key={`up-${i}`} style={s.upcomingCard} intensity={25}>
-                      <View style={[s.upcomingIcon, { backgroundColor: f.esBTS ? colorCalendario + '44' : colorExplore + '44' }]}>
-                        <Text style={{fontSize: 18}}>{f.esBTS ? '💜' : '📅'}</Text>
-                      </View>
-                      <Text style={[s.upcomingText, { color: colorInterfaz }]} numberOfLines={1}>{f.texto}</Text>
-                      <Text style={[s.upcomingDate, { color: colorInterfaz + '99' }]}>{f.dia} {MESES[f.mes].slice(0,3)}</Text>
-                   </GlassCard>
-                 ))}
-               </ScrollView>
-            </Animated.View>
-
-            <Animated.View entering={FadeInDown.delay(500).duration(800)} style={s.eventsSection}>
+            <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
                <Text style={[s.sectionTitle, { color: colorInterfaz }]}>Eventos del Mes</Text>
                {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
                  <GlassCard key={`bts-${i}`} style={s.eventItem} intensity={15}>
@@ -345,7 +298,7 @@ export default function Calendario() {
         )}
       </ScrollView>
 
-      {/* Modales de Ajustes y Eventos */}
+      {/* Modal de Ajustes Avanzado */}
       <Modal visible={menuVisible} transparent animationType="fade">
         <View style={s.modalOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setMenuVisible(false)} />
@@ -494,14 +447,6 @@ const s = StyleSheet.create({
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
   eventIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#fff', marginTop: 2, position: 'absolute', bottom: 5 },
-
-  // Nueva Sección Upcoming
-  upcomingSection: { marginBottom: 30 },
-  upcomingScroll: { paddingLeft: 5, gap: 15 },
-  upcomingCard: { width: 140, padding: 12, alignItems: 'center' },
-  upcomingIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  upcomingText: { fontSize: 13, fontWeight: '800', marginBottom: 4, textAlign: 'center', width: '100%' },
-  upcomingDate: { fontSize: 11, fontWeight: '600' },
 
   eventsSection: { marginTop: 10 },
   sectionTitle: { fontSize: 20, fontWeight: '800', marginBottom: 15, marginLeft: 5 },
