@@ -434,16 +434,16 @@ const s = StyleSheet.create({
   restoreUiCard: { paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 25 },
   restoreUiText: { color: '#fff', fontWeight: '800', fontSize: 10, letterSpacing: 0.5 },
 
-  calendarCard: { marginBottom: 25, paddingVertical: 10 },
-  navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 10 },
+  calendarCard: { marginBottom: 20, paddingVertical: 8 },
+  navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingHorizontal: 10 },
   navBtn: { padding: 5 },
-  mesTitulo: { fontSize: 18, fontWeight: '800', letterSpacing: 1 },
+  mesTitulo: { fontSize: 17, fontWeight: '800', letterSpacing: 1 },
 
-  diasSemanaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-  diaSemanaText: { fontSize: 12, fontWeight: '700', width: (width - 100) / 7, textAlign: 'center' },
+  diasSemanaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  diaSemanaText: { fontSize: 11, fontWeight: '700', width: (width - 100) / 7, textAlign: 'center' },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  celda: { width: (width - 100) / 7, height: 45, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  celda: { width: (width - 100) / 7, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
   eventIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#fff', marginTop: 2, position: 'absolute', bottom: 5 },
