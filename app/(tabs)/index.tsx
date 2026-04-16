@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -109,7 +109,37 @@ export default function Calendario() {
     if (menuVisible) {
       setMesAjusteFondo(mes);
     }
-  }, [menuVisible]);
+  }, [menuVisible, mes]);
+
+  // Lógica para calcular las próximas fechas ordenadas
+  const proximasFechas = useMemo(() => {
+    const todasLasFechas: any[] = [];
+    const anioActual = new Date().getFullYear();
+
+    // Añadir fechas de BTS
+    FECHAS_BTS.forEach(f => {
+      let fechaObj = new Date(anioActual, f.mes, f.dia);
+      // Si la fecha ya pasó este año, ponerla para el próximo año para el orden
+      if (fechaObj < hoy && (fechaObj.getDate() !== hoy.getDate() || fechaObj.getMonth() !== hoy.getMonth())) {
+        fechaObj = new Date(anioActual + 1, f.mes, f.dia);
+      }
+      todasLasFechas.push({ ...f, date: fechaObj, esBTS: true });
+    });
+
+    // Añadir eventos personalizados
+    Object.keys(eventos).forEach(clave => {
+      const [a, m, d] = clave.split('-').map(Number);
+      const fechaObj = new Date(a, m, d);
+      if (fechaObj >= hoy || (fechaObj.getDate() === hoy.getDate() && fechaObj.getMonth() === hoy.getMonth())) {
+        eventos[clave].forEach((texto: string) => {
+          todasLasFechas.push({ mes: m, dia: d, texto, date: fechaObj, esBTS: false });
+        });
+      }
+    });
+
+    // Ordenar por fecha más cercana
+    return todasLasFechas.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 5);
+  }, [eventos, hoy]);
 
   const guardarConfig = async (nuevaConfig: any) => {
     try {
@@ -142,10 +172,6 @@ export default function Calendario() {
       const nuevosFondos = { ...fondosPersonalizados, [mesAjusteFondo]: uri };
       setFondosPersonalizados(nuevosFondos);
       await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
-      // Si el mes que estamos editando es el mes actual del calendario, se actualizará solo
-      if (mesAjusteFondo === mes) {
-        // La actualización ya es reactiva por el estado fondosPersonalizados
-      }
     }
   };
 
@@ -283,7 +309,23 @@ export default function Calendario() {
               </TouchableOpacity>
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
+            {/* Nueva Sección: PRÓXIMAS FECHAS */}
+            <Animated.View entering={FadeInDown.delay(300).duration(800)} style={s.upcomingSection}>
+               <Text style={[s.sectionTitle, { color: colorInterfaz }]}>Próximas Fechas</Text>
+               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.upcomingScroll}>
+                 {proximasFechas.map((f, i) => (
+                   <GlassCard key={`up-${i}`} style={s.upcomingCard} intensity={25}>
+                      <View style={[s.upcomingIcon, { backgroundColor: f.esBTS ? colorCalendario + '44' : colorExplore + '44' }]}>
+                        <Text style={{fontSize: 18}}>{f.esBTS ? '💜' : '📅'}</Text>
+                      </View>
+                      <Text style={[s.upcomingText, { color: colorInterfaz }]} numberOfLines={1}>{f.texto}</Text>
+                      <Text style={[s.upcomingDate, { color: colorInterfaz + '99' }]}>{f.dia} {MESES[f.mes].slice(0,3)}</Text>
+                   </GlassCard>
+                 ))}
+               </ScrollView>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(500).duration(800)} style={s.eventsSection}>
                <Text style={[s.sectionTitle, { color: colorInterfaz }]}>Eventos del Mes</Text>
                {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
                  <GlassCard key={`bts-${i}`} style={s.eventItem} intensity={15}>
@@ -303,7 +345,7 @@ export default function Calendario() {
         )}
       </ScrollView>
 
-      {/* Modal de Ajustes Avanzado */}
+      {/* Modales de Ajustes y Eventos */}
       <Modal visible={menuVisible} transparent animationType="fade">
         <View style={s.modalOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setMenuVisible(false)} />
@@ -311,7 +353,6 @@ export default function Calendario() {
                 <GlassCard style={s.modalCard} intensity={60}>
                     <Text style={s.modalTitle}>PERSONALIZAR</Text>
                     
-                    {/* Tabs de Secciones */}
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.tabsScroll}>
                         <TouchableOpacity onPress={() => setSeccionAjustes('cal')} style={[s.tab, seccionAjustes === 'cal' && { borderBottomColor: colorCalendario, borderBottomWidth: 2 }]}>
                             <Text style={[s.tabText, seccionAjustes === 'cal' && { color: colorCalendario }]}>CALENDARIO</Text>
@@ -327,7 +368,6 @@ export default function Calendario() {
                         </TouchableOpacity>
                     </ScrollView>
 
-                    {/* Selector de Colores Dinámico */}
                     {(seccionAjustes === 'cal' || seccionAjustes === 'int' || seccionAjustes === 'exp') && (
                         <View style={s.colorGrid}>
                             {COLORES_PALETA.map((color, idx) => (
@@ -350,7 +390,6 @@ export default function Calendario() {
                         </View>
                     )}
 
-                    {/* Sección de Fondos Personalizados */}
                     {seccionAjustes === 'bg' && (
                         <View style={s.bgSettings}>
                             <View style={s.bgMonthNav}>
@@ -362,11 +401,9 @@ export default function Calendario() {
                                     <Ionicons name="chevron-forward" size={20} color="#fff" />
                                 </TouchableOpacity>
                             </View>
-
                             <View style={s.bgPreviewContainer}>
                                 <Image source={imagenPreviewAjuste} style={s.bgPreview} />
                             </View>
-
                             <View style={s.bgActionRow}>
                                 <TouchableOpacity style={[s.bgActionBtn, { backgroundColor: colorCalendario }]} onPress={seleccionarImagen}>
                                     <Ionicons name="image-outline" size={18} color="#fff" />
@@ -457,6 +494,14 @@ const s = StyleSheet.create({
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
   eventIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#fff', marginTop: 2, position: 'absolute', bottom: 5 },
+
+  // Nueva Sección Upcoming
+  upcomingSection: { marginBottom: 30 },
+  upcomingScroll: { paddingLeft: 5, gap: 15 },
+  upcomingCard: { width: 140, padding: 12, alignItems: 'center' },
+  upcomingIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  upcomingText: { fontSize: 13, fontWeight: '800', marginBottom: 4, textAlign: 'center', width: '100%' },
+  upcomingDate: { fontSize: 11, fontWeight: '600' },
 
   eventsSection: { marginTop: 10 },
   sectionTitle: { fontSize: 20, fontWeight: '800', marginBottom: 15, marginLeft: 5 },
