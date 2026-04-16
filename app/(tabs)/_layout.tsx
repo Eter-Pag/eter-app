@@ -1,45 +1,82 @@
-import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Tabs } from 'expo-router';
 import { BlurView } from 'expo-blur';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
 
 export default function TabLayout() {
-  const tintColor = '#9b59b6'; // Morado Borahae
-  const inactiveColor = 'rgba(255,255,255,0.4)';
+  const colorScheme = useColorScheme() ?? 'dark';
+  const t = Colors[colorScheme];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: tintColor,
-        tabBarInactiveTintColor: inactiveColor,
         headerShown: false,
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
         tabBarStyle: {
           position: 'absolute',
-          backgroundColor: 'rgba(13, 13, 26, 0.8)',
           borderTopWidth: 0,
           elevation: 0,
-          height: 60,
-          paddingBottom: 10,
+          height: Platform.OS === 'ios' ? 88 : 65,
+          backgroundColor: 'transparent',
         },
         tabBarBackground: () => (
-          <BlurView intensity={80} tint="dark" style={{ flex: 1 }} />
+          <View style={styles.tabBarBackground}>
+            <BlurView
+              intensity={40}
+              tint="dark"
+              style={StyleSheet.absoluteFill}
+            />
+            <View style={[styles.tabBarBorder, { backgroundColor: t.glassBorder }]} />
+          </View>
         ),
-      }}>
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '700',
+          marginBottom: Platform.OS === 'ios' ? -5 : 10, // Adjust label position
+          letterSpacing: 0.5,
+        },
+        tabBarIconStyle: {
+            marginTop: Platform.OS === 'ios' ? 10 : 0, // Adjust icon position
+        }
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Calendario',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'CALENDARIO',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Eter Web',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'EXPLORE',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={24} color={color} />
+          ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBarBackground: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(20, 20, 35, 0.6)', // Fallback color
+  },
+  tabBarBorder: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+  },
+});

@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Notifications from 'expo-notifications';
 import { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeIn, FadeInDown, SlideInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { GlassCard } from '@/components/GlassCard';
+import { WeatherWidget } from '@/components/WeatherWidget';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
-const HEADER_HEIGHT = height * 0.45; // 45% de la pantalla para la imagen de BTS
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -45,39 +47,26 @@ const FECHAS_BTS = [
   { mes: 11, dia: 30,texto: '🎂 Cumpleaños V' },
 ];
 
-const TEMAS = {
-  morado: { principal: '#9b59b6', fondo: '#0d0d1a', overlay: 'rgba(0,0,0,0.4)', celda: 'rgba(255,255,255,0.08)', borde: 'rgba(195,155,211,0.2)', texto: '#e8daef', hoy: '#6c3483', acento: '#d7bde2' },
-  rosa:   { principal: '#ec407a', fondo: '#1a0a10', overlay: 'rgba(0,0,0,0.4)', celda: 'rgba(255,255,255,0.08)', borde: 'rgba(255,182,210,0.2)', texto: '#fce4ec', hoy: '#c2185b', acento: '#f8bbd0' },
-  oscuro: { principal: '#ffffff', fondo: '#121212', overlay: 'rgba(0,0,0,0.6)', celda: 'rgba(255,255,255,0.05)', borde: 'rgba(255,255,255,0.1)', texto: '#f5f5f5', hoy: '#333333', acento: '#888888' },
-};
-
 const STORAGE_KEY = '@bts_eventos';
-const STORAGE_TEMA = '@bts_tema';
 
 export default function Calendario() {
+  const colorScheme = useColorScheme() ?? 'dark';
+  const t = Colors[colorScheme];
   const hoy = new Date();
   const [mes, setMes] = useState(hoy.getMonth());
   const [anio, setAnio] = useState(hoy.getFullYear());
   const [eventos, setEventos] = useState({});
-  const [diaSeleccionado, setDiaSeleccionado] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [nuevoEvento, setNuevoEvento] = useState('');
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [tema, setTema] = useState('morado');
 
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         const eventosGuardados = await AsyncStorage.getItem(STORAGE_KEY);
         if (eventosGuardados) setEventos(JSON.parse(eventosGuardados));
-        const temaGuardado = await AsyncStorage.getItem(STORAGE_TEMA);
-        if (temaGuardado) setTema(temaGuardado);
       } catch (e) { console.log('Error cargando datos:', e); }
     };
     cargarDatos();
   }, []);
 
-  const t = TEMAS[tema] || TEMAS.morado;
   const diasEnMes = new Date(anio, mes + 1, 0).getDate();
   const primerDia = new Date(anio, mes, 1).getDay();
 
@@ -88,56 +77,45 @@ export default function Calendario() {
   for (let i = 0; i < primerDia; i++) celdas.push(null);
   for (let d = 1; d <= diasEnMes; d++) celdas.push(d);
 
-  const fechaBTS = (d) => FECHAS_BTS.find(f => f.mes === mes && f.dia === d);
-  const tieneFechaBTS = (d) => !!fechaBTS(d);
-
+  const fechaBTS = (d: number) => FECHAS_BTS.find(f => f.mes === mes && f.dia === d);
+  
   return (
-    <View style={[s.container, { backgroundColor: t.fondo }]}>
+    <View style={[s.container, { backgroundColor: t.background }]}>
+      <Image source={IMAGENES[mes]} style={s.bgImage} blurRadius={Platform.OS === 'ios' ? 0 : 2} />
+      <LinearGradient colors={['rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
-      {/* PARTE SUPERIOR: IMAGEN (Boceto Usuario) */}
-      <View style={s.headerImageContainer}>
-        <Image source={IMAGENES[mes]} style={s.headerImage} />
-        <LinearGradient colors={['transparent', t.fondo]} style={s.imageGradient} />
-        
-        {/* Barra Superior (Título y Menú) */}
-        <View style={s.topBar}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
+        <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
           <View>
-            <Text style={s.titleText}>bts calendario</Text>
-            <Text style={s.koreanText}>방탄소년단 • ver v2.1</Text>
+            <Text style={s.titleText}>BTS CALENDAR</Text>
+            <Text style={s.koreanText}>방탄소년단 • 2026 Edition</Text>
           </View>
-          <TouchableOpacity onPress={() => setMenuVisible(!menuVisible)} style={s.menuIconBtn}>
-            <Text style={s.menuIcon}>☰</Text>
+          <TouchableOpacity style={s.profileBtn}>
+             <Ionicons name="person-circle-outline" size={32} color="#fff" />
           </TouchableOpacity>
-        </View>
-      </View>
+        </Animated.View>
 
-      {/* PARTE INFERIOR: CALENDARIO (Boceto Usuario) */}
-      <View style={s.calendarSection}>
-        <BlurView intensity={20} tint="dark" style={s.calendarBlur}>
-          
-          {/* Navegación Mes */}
-          <View style={s.navRow}>
-            <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
-              <Text style={[s.navBtnText, { color: t.principal }]}>◀</Text>
-            </TouchableOpacity>
-            <Text style={s.mesTitulo}>{MESES[mes].toUpperCase()} {anio}</Text>
-            <TouchableOpacity onPress={mesSiguiente} style={s.navBtn}>
-              <Text style={[s.navBtnText, { color: t.principal }]}>▶</Text>
-            </TouchableOpacity>
-          </View>
+        <WeatherWidget />
 
-          {/* Días Semana */}
-          <View style={s.diasSemanaRow}>
-            {DIAS.map(d => <Text key={d} style={[s.diaSemanaText, { color: t.acento }]}>{d}</Text>)}
-          </View>
+        <Animated.View entering={FadeInDown.delay(200).duration(800)}>
+          <GlassCard style={s.calendarCard}>
+            <View style={s.navRow}>
+              <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
+                <Ionicons name="chevron-back" size={24} color="#fff" />
+              </TouchableOpacity>
+              <Text style={s.mesTitulo}>{MESES[mes].toUpperCase()} {anio}</Text>
+              <TouchableOpacity onPress={mesSiguiente} style={s.navBtn}>
+                <Ionicons name="chevron-forward" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
-          {/* Grid del Calendario */}
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.gridScroll}>
+            <View style={s.diasSemanaRow}>
+              {DIAS.map(d => <Text key={d} style={s.diaSemanaText}>{d}</Text>)}
+            </View>
+
             <View style={s.grid}>
               {celdas.map((dia, i) => {
-                const clave = `${anio}-${mes}-${dia}`;
-                const tieneEvento = dia && eventos[clave]?.length > 0;
-                const esBTS = dia && tieneFechaBTS(dia);
+                const esBTS = dia && !!fechaBTS(dia);
                 const esHoy = dia === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear();
                 
                 return (
@@ -146,76 +124,73 @@ export default function Calendario() {
                     disabled={!dia}
                     style={[
                       s.celda, 
-                      { backgroundColor: t.celda, borderColor: t.borde },
-                      esHoy && { backgroundColor: t.hoy, borderColor: t.principal, borderWidth: 2 },
-                      esBTS && { borderBottomColor: t.principal, borderBottomWidth: 3 }
+                      esHoy && s.celdaHoy,
+                      esBTS && s.celdaBTS
                     ]} 
-                    onPress={() => dia && { /* Lógica de abrir día */ }}
                   >
-                    <Text style={[s.diaNum, { color: dia ? '#fff' : 'transparent' }, esHoy && { fontWeight: 'bold' }]}>{dia || ''}</Text>
-                    {esBTS && <Text style={s.btsDot}>💜</Text>}
+                    <Text style={[s.diaNum, { color: dia ? '#fff' : 'transparent' }, esHoy && { fontWeight: 'bold' }]}>
+                      {dia || ''}
+                    </Text>
+                    {esBTS && <View style={s.btsIndicator} />}
                   </TouchableOpacity>
                 );
               })}
             </View>
-          </ScrollView>
+          </GlassCard>
+        </Animated.View>
 
-        </BlurView>
-      </View>
-
-      {/* Menú Lateral (Modal) */}
-      <Modal visible={menuVisible} transparent animationType="slide">
-        <View style={s.menuOverlay}>
-          <BlurView intensity={90} tint="dark" style={s.menuContent}>
-            <Text style={[s.menuTitle, { color: t.principal }]}>CONFIGURACIÓN</Text>
-            <TouchableOpacity style={s.menuItem} onPress={() => setMenuVisible(false)}>
-              <Text style={s.menuItemText}>Cerrar ✕</Text>
-            </TouchableOpacity>
-            {/* Aquí puedes añadir más opciones de temas, etc. */}
-          </BlurView>
-        </View>
-      </Modal>
-
+        <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
+           <Text style={s.sectionTitle}>Eventos Especiales</Text>
+           {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
+             <GlassCard key={i} style={s.eventItem}>
+                <View style={s.eventContent}>
+                  <View style={s.eventIcon}>
+                    <Text style={{fontSize: 20}}>💜</Text>
+                  </View>
+                  <View>
+                    <Text style={s.eventText}>{f.texto}</Text>
+                    <Text style={s.eventDate}>{f.dia} de {MESES[mes]}</Text>
+                  </View>
+                </View>
+             </GlassCard>
+           ))}
+        </Animated.View>
+      </ScrollView>
     </View>
   );
 }
 
 const s = StyleSheet.create({
   container: { flex: 1 },
+  bgImage: { position: 'absolute', width: width, height: height, resizeMode: 'cover' },
+  overlay: { ...StyleSheet.absoluteFillObject },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 100 },
   
-  // Header Image (Boceto)
-  headerImageContainer: { width: '100%', height: HEADER_HEIGHT, overflow: 'hidden' },
-  headerImage: { width: '100%', height: '100%', resizeMode: 'cover' },
-  imageGradient: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 },
-  
-  topBar: { position: 'absolute', top: 50, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  titleText: { fontSize: 24, fontWeight: '900', color: '#fff', letterSpacing: 1 },
-  koreanText: { fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: '700', marginTop: 2 },
-  menuIconBtn: { padding: 5 },
-  menuIcon: { fontSize: 30, color: '#fff' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 },
+  titleText: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 2 },
+  koreanText: { fontSize: 14, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
+  profileBtn: { padding: 4 },
 
-  // Calendar Section (Boceto)
-  calendarSection: { flex: 1, marginTop: -30, borderTopLeftRadius: 40, borderTopRightRadius: 40, overflow: 'hidden' },
-  calendarBlur: { flex: 1, padding: 20 },
-  
-  navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  navBtn: { padding: 10 },
-  navBtnText: { fontSize: 20 },
-  mesTitulo: { fontSize: 22, fontWeight: '900', color: '#fff', letterSpacing: 2 },
+  calendarCard: { marginBottom: 25, paddingVertical: 10 },
+  navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 10 },
+  navBtn: { padding: 5 },
+  mesTitulo: { fontSize: 18, fontWeight: '800', color: '#fff', letterSpacing: 1 },
 
-  diasSemanaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15, paddingHorizontal: 10 },
-  diaSemanaText: { fontSize: 12, fontWeight: '800', width: (width - 60) / 7, textAlign: 'center' },
+  diasSemanaRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
+  diaSemanaText: { fontSize: 12, fontWeight: '700', color: 'rgba(255,255,255,0.6)', width: (width - 100) / 7, textAlign: 'center' },
 
-  gridScroll: { paddingBottom: 50 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  celda: { width: (width - 60) / 7, height: 55, borderRadius: 15, alignItems: 'center', justifyContent: 'center', marginBottom: 10, borderWidth: 1 },
-  diaNum: { fontSize: 16 },
-  btsDot: { fontSize: 8, position: 'absolute', bottom: 5 },
+  celda: { width: (width - 100) / 7, height: 45, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  celdaHoy: { backgroundColor: 'rgba(155, 89, 182, 0.6)', borderWidth: 1, borderColor: '#fff' },
+  celdaBTS: { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
+  diaNum: { fontSize: 15 },
+  btsIndicator: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#d7bde2', marginTop: 2 },
 
-  // Menu Modal
-  menuOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  menuContent: { height: '50%', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 30, alignItems: 'center' },
-  menuTitle: { fontSize: 20, fontWeight: '900', marginBottom: 30 },
-  menuItem: { padding: 15 },
-  menuItemText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  eventsSection: { marginTop: 10 },
+  sectionTitle: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 15, marginLeft: 5 },
+  eventItem: { marginBottom: 12 },
+  eventContent: { flexDirection: 'row', alignItems: 'center', gap: 15 },
+  eventIcon: { width: 45, height: 45, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
+  eventText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  eventDate: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 2 },
 });
