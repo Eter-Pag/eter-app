@@ -55,7 +55,7 @@ export function WeatherWidget() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator color="rgba(255,255,255,0.5)" />
+        <ActivityIndicator color="rgba(255,255,255,0.3)" size="small" />
       </View>
     );
   }
@@ -64,7 +64,7 @@ export function WeatherWidget() {
 
   return (
     <Animated.View entering={FadeIn.duration(1000)}>
-      <GlassCard style={styles.container} intensity={10}>
+      <GlassCard style={styles.container} intensity={5}>
         <View style={styles.content}>
           <View style={styles.leftInfo}>
             <Text style={styles.location}>{weather.location}</Text>
@@ -72,7 +72,7 @@ export function WeatherWidget() {
             <Text style={styles.condition}>{weather.condition}</Text>
           </View>
           <View style={styles.iconContainer}>
-            <Ionicons name={weather.icon} size={42} color="rgba(255,255,255,0.8)" />
+            <Ionicons name={weather.icon} size={36} color="rgba(255,255,255,0.4)" />
           </View>
         </View>
       </GlassCard>
@@ -82,47 +82,48 @@ export function WeatherWidget() {
 
 const styles = StyleSheet.create({
   loadingContainer: {
-    height: 80,
+    height: 60,
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   container: {
-    marginBottom: 20,
-    backgroundColor: 'rgba(255,255,255,0.02)', // Casi invisible
-    borderColor: 'rgba(255,255,255,0.05)',
+    marginBottom: 15,
+    backgroundColor: 'rgba(255,255,255,0.01)', // 1% de fondo para ser casi nulo
+    borderColor: 'rgba(255,255,255,0.03)',
+    padding: 8,
   },
   content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 2,
+    paddingVertical: 0,
   },
   leftInfo: {
     flex: 1,
   },
   location: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 10,
+    color: 'rgba(255,255,255,0.25)',
+    fontSize: 9,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   temp: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 32,
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 24,
     fontWeight: '900',
-    marginVertical: 0,
+    marginVertical: -2,
   },
   condition: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 12,
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 10,
     fontWeight: '600',
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.02)',
     alignItems: 'center',
     justifyContent: 'center',
   },

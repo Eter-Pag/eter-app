@@ -122,16 +122,18 @@ export default function Calendario() {
       <Image source={IMAGENES[mes]} style={s.bgImage} />
       <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
-      {/* Botón flotante para alternar UI (Ver Imagen / Ver Calendario) */}
-      <TouchableOpacity 
-        style={[s.toggleUiBtn, !uiVisible && s.toggleUiBtnHidden]} 
-        onPress={() => setUiVisible(!uiVisible)}
-      >
-        <GlassCard style={s.toggleUiCard} intensity={40}>
-            <Ionicons name={uiVisible ? "image-outline" : "calendar-outline"} size={24} color="#fff" />
-            <Text style={s.toggleUiText}>{uiVisible ? "VER IMAGEN" : "VER CALENDARIO"}</Text>
-        </GlassCard>
-      </TouchableOpacity>
+      {/* Botón flotante para restaurar UI (solo cuando está oculto) */}
+      {!uiVisible && (
+        <TouchableOpacity 
+          style={s.restoreUiBtn} 
+          onPress={() => setUiVisible(true)}
+        >
+          <GlassCard style={s.restoreUiCard} intensity={40}>
+              <Ionicons name="calendar-outline" size={16} color="#fff" />
+              <Text style={s.restoreUiText}>VER CALENDARIO</Text>
+          </GlassCard>
+        </TouchableOpacity>
+      )}
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
         {uiVisible && (
@@ -202,6 +204,17 @@ export default function Calendario() {
                   })}
                 </View>
               </GlassCard>
+              
+              {/* Botón para ocultar UI - Justo debajo del calendario */}
+              <TouchableOpacity 
+                style={s.hideUiBtn} 
+                onPress={() => setUiVisible(false)}
+              >
+                <View style={[s.hideUiInner, { backgroundColor: accentColor }]}>
+                    <Ionicons name="image-outline" size={14} color="#fff" />
+                    <Text style={s.hideUiText}>VER IMAGEN</Text>
+                </View>
+              </TouchableOpacity>
             </Animated.View>
 
             <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
@@ -310,10 +323,15 @@ const s = StyleSheet.create({
   titleText: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 2 },
   koreanText: { fontSize: 14, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
 
-  toggleUiBtn: { position: 'absolute', bottom: 100, right: 20, zIndex: 100 },
-  toggleUiBtnHidden: { bottom: 40, left: 20, right: 20 },
-  toggleUiCard: { padding: 12, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 30 },
-  toggleUiText: { color: '#fff', fontWeight: '900', fontSize: 12, letterSpacing: 1 },
+  // Botón Ocultar UI (Pequeño, morado, bajo el calendario)
+  hideUiBtn: { alignSelf: 'center', marginTop: -10, marginBottom: 20 },
+  hideUiInner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
+  hideUiText: { color: '#fff', fontWeight: '800', fontSize: 10, letterSpacing: 0.5 },
+
+  // Botón Restaurar UI (Discreto, abajo)
+  restoreUiBtn: { position: 'absolute', bottom: 40, alignSelf: 'center', zIndex: 100 },
+  restoreUiCard: { paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 25, backgroundColor: 'rgba(155, 89, 182, 0.6)' },
+  restoreUiText: { color: '#fff', fontWeight: '800', fontSize: 10, letterSpacing: 0.5 },
 
   calendarCard: { marginBottom: 25, paddingVertical: 10 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 10 },
