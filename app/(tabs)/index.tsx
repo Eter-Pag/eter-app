@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
 import * as ImagePicker from 'expo-image-picker';
+import * as Notifications from 'expo-notifications';
 import { GlassCard } from '@/components/GlassCard';
 import { WeatherWidget } from '@/components/WeatherWidget';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -12,6 +13,15 @@ import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
+
+// Configuración de comportamiento de notificaciones
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -99,6 +109,9 @@ export default function Calendario() {
 
         const fondosGuardados = await AsyncStorage.getItem(STORAGE_KEY_FONDOS);
         if (fondosGuardados) setFondosPersonalizados(JSON.parse(fondosGuardados));
+        
+        // Sincronizar notificaciones de BTS al iniciar
+        sincronizarNotificacionesBTS();
       } catch (e) { console.log('Error cargando datos:', e); }
     };
     cargarDatos();
@@ -109,6 +122,48 @@ export default function Calendario() {
       setMesAjusteFondo(mes);
     }
   }, [menuVisible, mes]);
+
+  // Función para pedir permiso de notificaciones y programar una
+  const programarNotificacion = async (dia: number, mes: number, texto: string) => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== 'granted') return;
+
+    const fechaEvento = new Date(new Date().getFullYear(), mes, dia, 9, 0, 0);
+    // Si la fecha ya pasó este año, programar para el próximo
+    if (fechaEvento < new Date()) {
+      fechaEvento.setFullYear(fechaEvento.getFullYear() + 1);
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "¡Recordatorio BTS Calendar! 💜",
+        body: texto,
+        data: { dia, mes },
+      },
+      trigger: {
+        date: fechaEvento,
+      },
+    });
+  };
+
+  const sincronizarNotificacionesBTS = async () => {
+    // Solo programar las del mes actual y el siguiente para no saturar
+    const mesActual = new Date().getMonth();
+    const proximas = FECHAS_BTS.filter(f => f.mes === mesActual || f.mes === (mesActual + 1) % 12);
+    
+    // Limpiar programaciones previas para evitar duplicados (opcional, mejor por ID)
+    // Por simplicidad en este MVP, solo programamos
+    proximas.forEach(f => {
+      programarNotificacion(f.dia, f.mes, f.texto);
+    });
+  };
 
   const guardarConfig = async (nuevaConfig: any) => {
     try {
@@ -165,6 +220,10 @@ export default function Calendario() {
     const nuevosEventos = { ...eventos, [clave]: [...(eventos[clave] || []), nuevoEventoTexto] };
     setEventos(nuevosEventos);
     await AsyncStorage.setItem(STORAGE_KEY_EVENTOS, JSON.stringify(nuevosEventos));
+    
+    // Programar notificación para el nuevo evento
+    programarNotificacion(diaSeleccionado, mes, nuevoEventoTexto);
+    
     setNuevoEventoTexto('');
     setModalEventoVisible(false);
   };
