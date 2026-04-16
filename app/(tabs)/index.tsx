@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
+import * as ImagePicker from 'expo-image-picker';
 import { GlassCard } from '@/components/GlassCard';
 import { WeatherWidget } from '@/components/WeatherWidget';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -15,7 +16,7 @@ const { width, height } = Dimensions.get('window');
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-const IMAGENES = [
+const IMAGENES_DEFAULT = [
   require('../../assets/images/enero.jpg'),
   require('../../assets/images/febrero.jpg'),
   require('../../assets/images/marzo.jpg'),
@@ -50,18 +51,11 @@ const FECHAS_BTS = [
 
 const STORAGE_KEY_EVENTOS = '@bts_eventos';
 const STORAGE_KEY_CONFIG = '@bts_config_temas';
+const STORAGE_KEY_FONDOS = '@bts_fondos_personalizados';
 
 const COLORES_PALETA = [
-  '#9b59b6', // Morado BTS
-  '#ec407a', // Rosa
-  '#3b82f6', // Azul
-  '#10b981', // Verde Menta
-  '#f59e0b', // Ambar
-  '#ef4444', // Rojo
-  '#06b6d4', // Cian
-  '#ffffff', // Blanco
-  '#fbbf24', // Dorado
-  '#a855f7', // Purpura Neón
+  '#9b59b6', '#ec407a', '#3b82f6', '#10b981', '#f59e0b',
+  '#ef4444', '#06b6d4', '#ffffff', '#fbbf24', '#a855f7',
 ];
 
 export default function Calendario() {
@@ -78,6 +72,7 @@ export default function Calendario() {
   const [colorCalendario, setColorCalendario] = useState('#9b59b6');
   const [colorInterfaz, setColorInterfaz] = useState('#ffffff');
   const [colorExplore, setColorExplore] = useState('#3b82f6');
+  const [fondosPersonalizados, setFondosPersonalizados] = useState<any>({});
   
   // Modales y Estados de UI
   const [menuVisible, setMenuVisible] = useState(false);
@@ -85,7 +80,7 @@ export default function Calendario() {
   const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
   const [nuevoEventoTexto, setNuevoEventoTexto] = useState('');
   const [uiVisible, setUiVisible] = useState(true);
-  const [seccionAjustes, setSeccionAjustes] = useState<'cal' | 'int' | 'exp'>('cal');
+  const [seccionAjustes, setSeccionAjustes] = useState<'cal' | 'int' | 'exp' | 'bg'>('cal');
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -100,6 +95,9 @@ export default function Calendario() {
             if (config.interfaz) setColorInterfaz(config.interfaz);
             if (config.explore) setColorExplore(config.explore);
         }
+
+        const fondosGuardados = await AsyncStorage.getItem(STORAGE_KEY_FONDOS);
+        if (fondosGuardados) setFondosPersonalizados(JSON.parse(fondosGuardados));
       } catch (e) { console.log('Error cargando datos:', e); }
     };
     cargarDatos();
@@ -112,6 +110,39 @@ export default function Calendario() {
         const configFinal = { ...configObj, ...nuevaConfig };
         await AsyncStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(configFinal));
     } catch (e) { console.log('Error guardando config:', e); }
+  };
+
+  const seleccionarImagen = async () => {
+    // Pedir permiso solo en el momento de la acción
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      if (Platform.OS !== 'web') {
+        Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para cambiar el fondo.');
+      }
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [9, 16],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      const nuevosFondos = { ...fondosPersonalizados, [mes]: uri };
+      setFondosPersonalizados(nuevosFondos);
+      await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
+    }
+  };
+
+  const restaurarImagenOriginal = async () => {
+    const nuevosFondos = { ...fondosPersonalizados };
+    delete nuevosFondos[mes];
+    setFondosPersonalizados(nuevosFondos);
+    await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
   };
 
   const guardarEvento = async () => {
@@ -136,9 +167,11 @@ export default function Calendario() {
 
   const fechaBTS = (d: number) => FECHAS_BTS.find(f => f.mes === mes && f.dia === d);
   
+  const imagenFondoActual = fondosPersonalizados[mes] ? { uri: fondosPersonalizados[mes] } : IMAGENES_DEFAULT[mes];
+  
   return (
     <View style={[s.container, { backgroundColor: t.background }]}>
-      <Image source={IMAGENES[mes]} style={s.bgImage} />
+      <Image source={imagenFondoActual} style={s.bgImage} />
       <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
       {!uiVisible && (
@@ -264,7 +297,7 @@ export default function Calendario() {
                     <Text style={s.modalTitle}>PERSONALIZAR</Text>
                     
                     {/* Tabs de Secciones */}
-                    <View style={s.tabsRow}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.tabsScroll}>
                         <TouchableOpacity onPress={() => setSeccionAjustes('cal')} style={[s.tab, seccionAjustes === 'cal' && { borderBottomColor: colorCalendario, borderBottomWidth: 2 }]}>
                             <Text style={[s.tabText, seccionAjustes === 'cal' && { color: colorCalendario }]}>CALENDARIO</Text>
                         </TouchableOpacity>
@@ -274,28 +307,55 @@ export default function Calendario() {
                         <TouchableOpacity onPress={() => setSeccionAjustes('exp')} style={[s.tab, seccionAjustes === 'exp' && { borderBottomColor: colorExplore, borderBottomWidth: 2 }]}>
                             <Text style={[s.tabText, seccionAjustes === 'exp' && { color: colorExplore }]}>EXPLORE</Text>
                         </TouchableOpacity>
-                    </View>
+                        <TouchableOpacity onPress={() => setSeccionAjustes('bg')} style={[s.tab, seccionAjustes === 'bg' && { borderBottomColor: '#fff', borderBottomWidth: 2 }]}>
+                            <Text style={[s.tabText, seccionAjustes === 'bg' && { color: '#fff' }]}>FONDOS</Text>
+                        </TouchableOpacity>
+                    </ScrollView>
 
                     {/* Selector de Colores Dinámico */}
-                    <View style={s.colorGrid}>
-                        {COLORES_PALETA.map((color, idx) => (
-                            <TouchableOpacity 
-                                key={idx} 
-                                style={[s.colorCircle, { backgroundColor: color }]} 
-                                onPress={() => {
-                                    if (seccionAjustes === 'cal') { setColorCalendario(color); guardarConfig({calendario: color}); }
-                                    if (seccionAjustes === 'int') { setColorInterfaz(color); guardarConfig({interfaz: color}); }
-                                    if (seccionAjustes === 'exp') { setColorExplore(color); guardarConfig({explore: color}); }
-                                }}
-                            >
-                                {((seccionAjustes === 'cal' && colorCalendario === color) || 
-                                  (seccionAjustes === 'int' && colorInterfaz === color) || 
-                                  (seccionAjustes === 'exp' && colorExplore === color)) && (
-                                    <Ionicons name="checkmark" size={18} color={color === '#ffffff' ? '#000' : '#fff'} />
+                    {(seccionAjustes === 'cal' || seccionAjustes === 'int' || seccionAjustes === 'exp') && (
+                        <View style={s.colorGrid}>
+                            {COLORES_PALETA.map((color, idx) => (
+                                <TouchableOpacity 
+                                    key={idx} 
+                                    style={[s.colorCircle, { backgroundColor: color }]} 
+                                    onPress={() => {
+                                        if (seccionAjustes === 'cal') { setColorCalendario(color); guardarConfig({calendario: color}); }
+                                        if (seccionAjustes === 'int') { setColorInterfaz(color); guardarConfig({interfaz: color}); }
+                                        if (seccionAjustes === 'exp') { setColorExplore(color); guardarConfig({explore: color}); }
+                                    }}
+                                >
+                                    {((seccionAjustes === 'cal' && colorCalendario === color) || 
+                                      (seccionAjustes === 'int' && colorInterfaz === color) || 
+                                      (seccionAjustes === 'exp' && colorExplore === color)) && (
+                                        <Ionicons name="checkmark" size={18} color={color === '#ffffff' ? '#000' : '#fff'} />
+                                    )}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
+
+                    {/* Sección de Fondos Personalizados */}
+                    {seccionAjustes === 'bg' && (
+                        <View style={s.bgSettings}>
+                            <Text style={s.bgInfoText}>Fondo de {MESES[mes]}</Text>
+                            <View style={s.bgPreviewContainer}>
+                                <Image source={imagenFondoActual} style={s.bgPreview} />
+                            </View>
+                            <View style={s.bgActionRow}>
+                                <TouchableOpacity style={[s.bgActionBtn, { backgroundColor: colorCalendario }]} onPress={seleccionarImagen}>
+                                    <Ionicons name="image-outline" size={18} color="#fff" />
+                                    <Text style={s.bgActionBtnText}>CAMBIAR</Text>
+                                </TouchableOpacity>
+                                {fondosPersonalizados[mes] && (
+                                    <TouchableOpacity style={s.bgActionBtnRestore} onPress={restaurarImagenOriginal}>
+                                        <Ionicons name="refresh-outline" size={18} color="#fff" />
+                                        <Text style={s.bgActionBtnText}>ORIGINAL</Text>
+                                    </TouchableOpacity>
                                 )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                            </View>
+                        </View>
+                    )}
 
                     <TouchableOpacity style={[s.closeBtn, { backgroundColor: colorInterfaz + '20' }]} onPress={() => setMenuVisible(false)}>
                         <Text style={[s.closeBtnText, { color: colorInterfaz }]}>GUARDAR CAMBIOS</Text>
@@ -388,13 +448,23 @@ const s = StyleSheet.create({
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 15, letterSpacing: 2 },
   modalSub: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginBottom: 20 },
   
-  tabsRow: { flexDirection: 'row', width: '100%', justifyContent: 'space-around', marginBottom: 25 },
-  tab: { paddingVertical: 8, paddingHorizontal: 5 },
+  tabsScroll: { width: '100%', marginBottom: 25 },
+  tab: { paddingVertical: 8, paddingHorizontal: 15 },
   tabText: { fontSize: 11, fontWeight: '900', color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5 },
 
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 30 },
   colorCircle: { width: 45, height: 45, borderRadius: 22.5, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
   
+  // Fondos Settings
+  bgSettings: { width: '100%', alignItems: 'center', marginBottom: 30 },
+  bgInfoText: { color: '#fff', fontSize: 14, fontWeight: '700', marginBottom: 15 },
+  bgPreviewContainer: { width: 120, height: 200, borderRadius: 15, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)', marginBottom: 20 },
+  bgPreview: { width: '100%', height: '100%' },
+  bgActionRow: { flexDirection: 'row', gap: 15 },
+  bgActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 15 },
+  bgActionBtnRestore: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)' },
+  bgActionBtnText: { color: '#fff', fontWeight: '800', fontSize: 12 },
+
   input: { width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 15, padding: 15, color: '#fff', fontSize: 16, marginBottom: 25, borderWidth: 1 },
   modalBtnRow: { flexDirection: 'row', gap: 15, width: '100%' },
   actionBtn: { flex: 1, height: 50, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
