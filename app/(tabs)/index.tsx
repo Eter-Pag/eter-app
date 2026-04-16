@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
 import { GlassCard } from '@/components/GlassCard';
 import { WeatherWidget } from '@/components/WeatherWidget';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -68,11 +68,12 @@ export default function Calendario() {
   const [eventos, setEventos] = useState<any>({});
   const [accentColor, setAccentColor] = useState('#9b59b6');
   
-  // Modales
+  // Modales y Estados de UI
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalEventoVisible, setModalEventoVisible] = useState(false);
   const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
   const [nuevoEventoTexto, setNuevoEventoTexto] = useState('');
+  const [uiVisible, setUiVisible] = useState(true);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -119,122 +120,133 @@ export default function Calendario() {
   return (
     <View style={[s.container, { backgroundColor: t.background }]}>
       <Image source={IMAGENES[mes]} style={s.bgImage} />
-      {/* Gradiente más suave arriba para ver mejor la imagen */}
-      <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.4)', t.background]} style={s.overlay} />
+      <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
+      {/* Botón flotante para alternar UI (Ver Imagen / Ver Calendario) */}
+      <TouchableOpacity 
+        style={[s.toggleUiBtn, !uiVisible && s.toggleUiBtnHidden]} 
+        onPress={() => setUiVisible(!uiVisible)}
+      >
+        <GlassCard style={s.toggleUiCard} intensity={40}>
+            <Ionicons name={uiVisible ? "image-outline" : "calendar-outline"} size={24} color="#fff" />
+            <Text style={s.toggleUiText}>{uiVisible ? "VER IMAGEN" : "VER CALENDARIO"}</Text>
+        </GlassCard>
+      </TouchableOpacity>
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
-        <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
-          <View>
-            <Text style={s.titleText}>BTS CALENDAR</Text>
-            <Text style={s.koreanText}>방탄소년단 • 2026 Edition</Text>
-          </View>
-          <View style={s.headerBtns}>
-              <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
-                 <Ionicons name="settings-outline" size={24} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity style={s.iconBtn}>
-                 <Ionicons name="person-circle-outline" size={32} color="#fff" />
-              </TouchableOpacity>
-          </View>
-        </Animated.View>
-
-        <WeatherWidget />
-
-        <Animated.View entering={FadeInDown.delay(200).duration(800)}>
-          <GlassCard style={s.calendarCard} intensity={25}>
-            <View style={s.navRow}>
-              <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
-                <Ionicons name="chevron-back" size={24} color="#fff" />
-              </TouchableOpacity>
-              <Text style={s.mesTitulo}>{MESES[mes].toUpperCase()} {anio}</Text>
-              <TouchableOpacity onPress={mesSiguiente} style={s.navBtn}>
-                <Ionicons name="chevron-forward" size={24} color="#fff" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={s.diasSemanaRow}>
-              {DIAS.map(d => <Text key={d} style={s.diaSemanaText}>{d}</Text>)}
-            </View>
-
-            <View style={s.grid}>
-              {celdas.map((dia, i) => {
-                const esBTS = dia && !!fechaBTS(dia);
-                const esHoy = dia === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear();
-                const clave = `${anio}-${mes}-${dia}`;
-                const tieneEvento = dia && eventos[clave]?.length > 0;
-                
-                return (
-                  <TouchableOpacity 
-                    key={i} 
-                    disabled={!dia}
-                    onPress={() => {
-                        if (dia) {
-                            setDiaSeleccionado(dia);
-                            setModalEventoVisible(true);
-                        }
-                    }}
-                    style={[
-                      s.celda, 
-                      esHoy && { backgroundColor: accentColor + '99', borderColor: '#fff', borderWidth: 1 },
-                      (esBTS || tieneEvento) && { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
-                    ]} 
-                  >
-                    <Text style={[s.diaNum, { color: dia ? '#fff' : 'transparent' }, esHoy && { fontWeight: 'bold' }]}>
-                      {dia || ''}
-                    </Text>
-                    {esBTS && <View style={[s.btsIndicator, { backgroundColor: accentColor }]} />}
-                    {tieneEvento && <View style={s.eventIndicator} />}
+        {uiVisible && (
+          <Animated.View entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)}>
+            <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
+              <View>
+                <Text style={s.titleText}>BTS CALENDAR</Text>
+                <Text style={s.koreanText}>방탄소년단 • 2026 Edition</Text>
+              </View>
+              <View style={s.headerBtns}>
+                  <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
+                     <Ionicons name="settings-outline" size={24} color="#fff" />
                   </TouchableOpacity>
-                );
-              })}
-            </View>
-          </GlassCard>
-        </Animated.View>
+                  <TouchableOpacity style={s.iconBtn}>
+                     <Ionicons name="person-circle-outline" size={32} color="#fff" />
+                  </TouchableOpacity>
+              </View>
+            </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
-           <Text style={s.sectionTitle}>Eventos del Mes</Text>
-           {/* Eventos Oficiales BTS */}
-           {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
-             <GlassCard key={`bts-${i}`} style={s.eventItem} intensity={20}>
-                <View style={s.eventContent}>
-                  <View style={[s.eventIcon, { backgroundColor: accentColor + '33' }]}>
-                    <Text style={{fontSize: 20}}>💜</Text>
-                  </View>
-                  <View>
-                    <Text style={s.eventText}>{f.texto}</Text>
-                    <Text style={s.eventDate}>{f.dia} de {MESES[mes]}</Text>
-                  </View>
+            <WeatherWidget />
+
+            <Animated.View entering={FadeInDown.delay(200).duration(800)}>
+              <GlassCard style={s.calendarCard} intensity={20}>
+                <View style={s.navRow}>
+                  <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
+                    <Ionicons name="chevron-back" size={24} color="#fff" />
+                  </TouchableOpacity>
+                  <Text style={s.mesTitulo}>{MESES[mes].toUpperCase()} {anio}</Text>
+                  <TouchableOpacity onPress={mesSiguiente} style={s.navBtn}>
+                    <Ionicons name="chevron-forward" size={24} color="#fff" />
+                  </TouchableOpacity>
                 </View>
-             </GlassCard>
-           ))}
-           {/* Eventos Personalizados */}
-           {Object.keys(eventos).filter(k => k.startsWith(`${anio}-${mes}-`)).map((k, i) => {
-               const dia = k.split('-')[2];
-               return eventos[k].map((txt: string, idx: number) => (
-                <GlassCard key={`user-${i}-${idx}`} style={s.eventItem} intensity={20}>
+
+                <View style={s.diasSemanaRow}>
+                  {DIAS.map(d => <Text key={d} style={s.diaSemanaText}>{d}</Text>)}
+                </View>
+
+                <View style={s.grid}>
+                  {celdas.map((dia, i) => {
+                    const esBTS = dia && !!fechaBTS(dia);
+                    const esHoy = dia === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear();
+                    const clave = `${anio}-${mes}-${dia}`;
+                    const tieneEvento = dia && eventos[clave]?.length > 0;
+                    
+                    return (
+                      <TouchableOpacity 
+                        key={i} 
+                        disabled={!dia}
+                        onPress={() => {
+                            if (dia) {
+                                setDiaSeleccionado(dia);
+                                setModalEventoVisible(true);
+                            }
+                        }}
+                        style={[
+                          s.celda, 
+                          esHoy && { backgroundColor: accentColor + '99', borderColor: '#fff', borderWidth: 1 },
+                          (esBTS || tieneEvento) && { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
+                        ]} 
+                      >
+                        <Text style={[s.diaNum, { color: dia ? '#fff' : 'transparent' }, esHoy && { fontWeight: 'bold' }]}>
+                          {dia || ''}
+                        </Text>
+                        {esBTS && <View style={[s.btsIndicator, { backgroundColor: accentColor }]} />}
+                        {tieneEvento && <View style={s.eventIndicator} />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </GlassCard>
+            </Animated.View>
+
+            <Animated.View entering={FadeInDown.delay(400).duration(800)} style={s.eventsSection}>
+               <Text style={s.sectionTitle}>Eventos del Mes</Text>
+               {FECHAS_BTS.filter(f => f.mes === mes).map((f, i) => (
+                 <GlassCard key={`bts-${i}`} style={s.eventItem} intensity={15}>
                     <View style={s.eventContent}>
-                    <View style={[s.eventIcon, { backgroundColor: 'rgba(255,255,255,0.1)' }]}>
-                        <Ionicons name="calendar-outline" size={20} color="#fff" />
+                      <View style={[s.eventIcon, { backgroundColor: accentColor + '33' }]}>
+                        <Text style={{fontSize: 20}}>💜</Text>
+                      </View>
+                      <View>
+                        <Text style={s.eventText}>{f.texto}</Text>
+                        <Text style={s.eventDate}>{f.dia} de {MESES[mes]}</Text>
+                      </View>
                     </View>
-                    <View>
-                        <Text style={s.eventText}>{txt}</Text>
-                        <Text style={s.eventDate}>{dia} de {MESES[mes]}</Text>
-                    </View>
-                    </View>
-                </GlassCard>
-               ));
-           })}
-        </Animated.View>
+                 </GlassCard>
+               ))}
+               {Object.keys(eventos).filter(k => k.startsWith(`${anio}-${mes}-`)).map((k, i) => {
+                   const dia = k.split('-')[2];
+                   return eventos[k].map((txt: string, idx: number) => (
+                    <GlassCard key={`user-${i}-${idx}`} style={s.eventItem} intensity={15}>
+                        <View style={s.eventContent}>
+                        <View style={[s.eventIcon, { backgroundColor: 'rgba(255,255,255,0.05)' }]}>
+                            <Ionicons name="calendar-outline" size={20} color="#fff" />
+                        </View>
+                        <View>
+                            <Text style={s.eventText}>{txt}</Text>
+                            <Text style={s.eventDate}>{dia} de {MESES[mes]}</Text>
+                        </View>
+                        </View>
+                    </GlassCard>
+                   ));
+               })}
+            </Animated.View>
+          </Animated.View>
+        )}
       </ScrollView>
 
-      {/* Modal de Ajustes */}
+      {/* Modales de Ajustes y Eventos */}
       <Modal visible={menuVisible} transparent animationType="fade">
         <View style={s.modalOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setMenuVisible(false)} />
             <Animated.View entering={FadeIn.duration(300)} style={s.modalContainer}>
                 <GlassCard style={s.modalCard} intensity={50}>
                     <Text style={s.modalTitle}>AJUSTES</Text>
-                    
                     <Text style={s.modalSub}>Temas de Color</Text>
                     <View style={s.themeRow}>
                         {Object.entries(TEMAS_PERSONALIZADOS).map(([name, theme]) => (
@@ -247,7 +259,6 @@ export default function Calendario() {
                             </TouchableOpacity>
                         ))}
                     </View>
-
                     <TouchableOpacity style={s.closeBtn} onPress={() => setMenuVisible(false)}>
                         <Text style={s.closeBtnText}>CERRAR</Text>
                     </TouchableOpacity>
@@ -256,7 +267,6 @@ export default function Calendario() {
         </View>
       </Modal>
 
-      {/* Modal Nuevo Evento */}
       <Modal visible={modalEventoVisible} transparent animationType="slide">
         <View style={s.modalOverlay}>
             <TouchableOpacity style={StyleSheet.absoluteFill} onPress={() => setModalEventoVisible(false)} />
@@ -264,7 +274,6 @@ export default function Calendario() {
                 <GlassCard style={s.modalCard} intensity={60}>
                     <Text style={s.modalTitle}>NUEVO EVENTO</Text>
                     <Text style={s.modalSub}>{diaSeleccionado} de {MESES[mes]}</Text>
-                    
                     <TextInput 
                         style={s.input}
                         placeholder="Nombre del evento..."
@@ -273,7 +282,6 @@ export default function Calendario() {
                         onChangeText={setNuevoEventoTexto}
                         autoFocus
                     />
-
                     <View style={s.modalBtnRow}>
                         <TouchableOpacity style={[s.actionBtn, { backgroundColor: accentColor }]} onPress={guardarEvento}>
                             <Text style={s.actionBtnText}>GUARDAR</Text>
@@ -286,7 +294,6 @@ export default function Calendario() {
             </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -295,13 +302,18 @@ const s = StyleSheet.create({
   container: { flex: 1 },
   bgImage: { position: 'absolute', width: width, height: height, resizeMode: 'cover' },
   overlay: { ...StyleSheet.absoluteFillObject },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 120 },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 140 },
   
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
   headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconBtn: { padding: 5 },
   titleText: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 2 },
   koreanText: { fontSize: 14, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
+
+  toggleUiBtn: { position: 'absolute', bottom: 100, right: 20, zIndex: 100 },
+  toggleUiBtnHidden: { bottom: 40, left: 20, right: 20 },
+  toggleUiCard: { padding: 12, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 30 },
+  toggleUiText: { color: '#fff', fontWeight: '900', fontSize: 12, letterSpacing: 1 },
 
   calendarCard: { marginBottom: 25, paddingVertical: 10 },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, paddingHorizontal: 10 },
@@ -325,25 +337,20 @@ const s = StyleSheet.create({
   eventText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   eventDate: { color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 2 },
 
-  // Modales
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   modalContainer: { width: '100%', maxWidth: 400 },
   modalBottomContainer: { width: '100%', maxWidth: 400, position: 'absolute', bottom: 40 },
   modalCard: { padding: 25, alignItems: 'center' },
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 10, letterSpacing: 2 },
   modalSub: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginBottom: 20 },
-  
   themeRow: { flexDirection: 'row', gap: 20, marginBottom: 30 },
   themeCircle: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' },
-  
   input: { width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 15, padding: 15, color: '#fff', fontSize: 16, marginBottom: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  
   modalBtnRow: { flexDirection: 'row', gap: 15, width: '100%' },
   actionBtn: { flex: 1, height: 50, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   actionBtnText: { color: '#fff', fontWeight: '900', letterSpacing: 1 },
   cancelBtn: { flex: 1, height: 50, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
   cancelBtnText: { color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
-  
   closeBtn: { width: '100%', height: 50, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { color: '#fff', fontWeight: '900', letterSpacing: 1 },
 });
