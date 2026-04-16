@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
 import { GlassCard } from '@/components/GlassCard';
 import { WeatherWidget } from '@/components/WeatherWidget';
@@ -57,6 +58,7 @@ const TEMAS_PERSONALIZADOS = {
 };
 
 export default function Calendario() {
+  const insets = useSafeAreaInsets();
   const systemColorScheme = useColorScheme() ?? 'dark';
   const [temaManual, setTemaManual] = useState<string | null>(null);
   const colorScheme = (temaManual === 'oscuro' ? 'dark' : (temaManual === 'claro' ? 'light' : systemColorScheme)) as 'light' | 'dark';
@@ -68,7 +70,6 @@ export default function Calendario() {
   const [eventos, setEventos] = useState<any>({});
   const [accentColor, setAccentColor] = useState('#9b59b6');
   
-  // Modales y Estados de UI
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalEventoVisible, setModalEventoVisible] = useState(false);
   const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
@@ -122,20 +123,30 @@ export default function Calendario() {
       <Image source={IMAGENES[mes]} style={s.bgImage} />
       <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
-      {/* Botón flotante para restaurar UI (solo cuando está oculto) */}
+      {/* Navegación flotante lateral (solo en modo imagen) */}
       {!uiVisible && (
-        <TouchableOpacity 
-          style={s.restoreUiBtn} 
-          onPress={() => setUiVisible(true)}
-        >
-          <GlassCard style={s.restoreUiCard} intensity={40}>
-              <Ionicons name="calendar-outline" size={16} color="#fff" />
-              <Text style={s.restoreUiText}>VER CALENDARIO</Text>
-          </GlassCard>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity style={[s.sideNavBtn, { left: 10 }]} onPress={mesAnterior}>
+            <GlassCard style={s.sideNavCard} intensity={20}>
+              <Ionicons name="chevron-back" size={24} color="#fff" />
+            </GlassCard>
+          </TouchableOpacity>
+          <TouchableOpacity style={[s.sideNavBtn, { right: 10 }]} onPress={mesSiguiente}>
+            <GlassCard style={s.sideNavCard} intensity={20}>
+              <Ionicons name="chevron-forward" size={24} color="#fff" />
+            </GlassCard>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={s.restoreUiBtn} onPress={() => setUiVisible(true)}>
+            <GlassCard style={s.restoreUiCard} intensity={40}>
+                <Ionicons name="calendar-outline" size={16} color="#fff" />
+                <Text style={s.restoreUiText}>VER CALENDARIO</Text>
+            </GlassCard>
+          </TouchableOpacity>
+        </>
       )}
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scrollContent}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scrollContent, { paddingTop: insets.top + 5 }]}>
         {uiVisible && (
           <Animated.View entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)}>
             <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
@@ -205,11 +216,7 @@ export default function Calendario() {
                 </View>
               </GlassCard>
               
-              {/* Botón para ocultar UI - Justo debajo del calendario */}
-              <TouchableOpacity 
-                style={s.hideUiBtn} 
-                onPress={() => setUiVisible(false)}
-              >
+              <TouchableOpacity style={s.hideUiBtn} onPress={() => setUiVisible(false)}>
                 <View style={[s.hideUiInner, { backgroundColor: accentColor }]}>
                     <Ionicons name="image-outline" size={14} color="#fff" />
                     <Text style={s.hideUiText}>VER IMAGEN</Text>
@@ -232,22 +239,6 @@ export default function Calendario() {
                     </View>
                  </GlassCard>
                ))}
-               {Object.keys(eventos).filter(k => k.startsWith(`${anio}-${mes}-`)).map((k, i) => {
-                   const dia = k.split('-')[2];
-                   return eventos[k].map((txt: string, idx: number) => (
-                    <GlassCard key={`user-${i}-${idx}`} style={s.eventItem} intensity={15}>
-                        <View style={s.eventContent}>
-                        <View style={[s.eventIcon, { backgroundColor: 'rgba(255,255,255,0.05)' }]}>
-                            <Ionicons name="calendar-outline" size={20} color="#fff" />
-                        </View>
-                        <View>
-                            <Text style={s.eventText}>{txt}</Text>
-                            <Text style={s.eventDate}>{dia} de {MESES[mes]}</Text>
-                        </View>
-                        </View>
-                    </GlassCard>
-                   ));
-               })}
             </Animated.View>
           </Animated.View>
         )}
@@ -315,20 +306,21 @@ const s = StyleSheet.create({
   container: { flex: 1 },
   bgImage: { position: 'absolute', width: width, height: height, resizeMode: 'cover' },
   overlay: { ...StyleSheet.absoluteFillObject },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 140 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 140 },
   
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconBtn: { padding: 5 },
   titleText: { fontSize: 28, fontWeight: '900', color: '#fff', letterSpacing: 2 },
   koreanText: { fontSize: 14, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
 
-  // Botón Ocultar UI (Pequeño, morado, bajo el calendario)
+  sideNavBtn: { position: 'absolute', top: height / 2 - 25, zIndex: 110, width: 50, height: 50 },
+  sideNavCard: { width: 50, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center', padding: 0 },
+
   hideUiBtn: { alignSelf: 'center', marginTop: -10, marginBottom: 20 },
   hideUiInner: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
   hideUiText: { color: '#fff', fontWeight: '800', fontSize: 10, letterSpacing: 0.5 },
 
-  // Botón Restaurar UI (Discreto, abajo)
   restoreUiBtn: { position: 'absolute', bottom: 40, alignSelf: 'center', zIndex: 100 },
   restoreUiCard: { paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 25, backgroundColor: 'rgba(155, 89, 182, 0.6)' },
   restoreUiText: { color: '#fff', fontWeight: '800', fontSize: 10, letterSpacing: 0.5 },
