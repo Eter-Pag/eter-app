@@ -225,7 +225,7 @@ export default function Calendario() {
 
             <WeatherWidget />
 
-            <Animated.View entering={FadeInDown.delay(200).duration(800)}>
+            <Animated.View entering={FadeInDown.delay(200).duration(800)} style={{ marginTop: 35 }}>
               <GlassCard style={s.calendarCard} intensity={20}>
                 <View style={s.navRow}>
                   <TouchableOpacity onPress={mesAnterior} style={s.navBtn}>
