@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { Image } from 'expo-image';
 import { Linking, ScrollView, StyleSheet, TouchableOpacity, View, Dimensions, Platform, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +11,7 @@ import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
+const STORAGE_KEY_CONFIG = '@bts_config_temas';
 
 const imgNoticias = require('../images/noticias.png');
 const imgTienda = require('../images/tienda.png');
@@ -21,6 +24,27 @@ export default function TabTwoScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? 'dark';
   const t = Colors[colorScheme];
+  
+  const [colorExplore, setColorExplore] = useState('#3b82f6');
+  const [colorInterfaz, setColorInterfaz] = useState('#ffffff');
+
+  useEffect(() => {
+    const cargarConfig = async () => {
+      try {
+        const configGuardada = await AsyncStorage.getItem(STORAGE_KEY_CONFIG);
+        if (configGuardada) {
+            const config = JSON.parse(configGuardada);
+            if (config.explore) setColorExplore(config.explore);
+            if (config.interfaz) setColorInterfaz(config.interfaz);
+        }
+      } catch (e) { console.log('Error cargando config:', e); }
+    };
+    cargarConfig();
+    
+    // Escuchar cambios cada vez que la pantalla gana foco (opcional, pero útil)
+    const interval = setInterval(cargarConfig, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   const tools = [
     { title: "Noticias", image: imgNoticias, icon: "newspaper-outline", color: "#3B82F6", url: "https://eter-production-f148.up.railway.app/noticias" },
@@ -36,8 +60,6 @@ export default function TabTwoScreen() {
       const supported = await Linking.canOpenURL(url);
       if (supported || Platform.OS === 'web') {
         await Linking.openURL(url);
-      } else {
-        console.warn("No se puede abrir la URL: " + url);
       }
     } catch (error) {
       console.error("Error al abrir URL:", error);
@@ -46,15 +68,16 @@ export default function TabTwoScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: t.background }]}>
-      <LinearGradient colors={['#1a1a2e', '#0d0d1a']} style={StyleSheet.absoluteFill} />
+      {/* Fondo dinámico basado en el color de Explore */}
+      <LinearGradient colors={[colorExplore + '33', '#0d0d1a']} style={StyleSheet.absoluteFill} />
       
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInDown.duration(800)}>
-          <Text style={styles.title}>EXPLORE</Text>
-          <Text style={styles.subtitle}>EterKpop MX Universe</Text>
+          <Text style={[styles.title, { color: colorExplore }]}>EXPLORE</Text>
+          <Text style={[styles.subtitle, { color: colorInterfaz + '99' }]}>EterKpop MX Universe</Text>
         </Animated.View>
 
         <View style={styles.gridContainer}>
@@ -76,7 +99,7 @@ export default function TabTwoScreen() {
                     <View style={[styles.iconContainer, { backgroundColor: tool.color + '50' }]}>
                       <Ionicons name={tool.icon as any} size={22} color={tool.color} />
                     </View>
-                    <Text style={styles.cardTitle}>{tool.title}</Text>
+                    <Text style={[styles.cardTitle, { color: colorInterfaz }]}>{tool.title}</Text>
                   </View>
                 </GlassCard>
               </TouchableOpacity>
@@ -85,7 +108,7 @@ export default function TabTwoScreen() {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>ETER KPOP MX • 2026</Text>
+          <Text style={[styles.footerText, { color: colorInterfaz + '4D' }]}>ETER KPOP MX • 2026</Text>
         </View>
       </ScrollView>
     </View>
@@ -95,8 +118,8 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 120 },
-  title: { fontSize: 32, fontWeight: '900', color: '#fff', letterSpacing: 4 },
-  subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '600', marginBottom: 30, letterSpacing: 1 },
+  title: { fontSize: 32, fontWeight: '900', letterSpacing: 4 },
+  subtitle: { fontSize: 14, fontWeight: '600', marginBottom: 30, letterSpacing: 1 },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -138,9 +161,8 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '900',
-    color: '#fff',
     letterSpacing: 0.5,
   },
   footer: { alignItems: 'center', marginTop: 50, paddingBottom: 20 },
-  footerText: { color: 'rgba(255,255,255,0.3)', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  footerText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },
 });
