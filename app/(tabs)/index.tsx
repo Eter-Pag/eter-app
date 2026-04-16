@@ -81,6 +81,7 @@ export default function Calendario() {
   const [nuevoEventoTexto, setNuevoEventoTexto] = useState('');
   const [uiVisible, setUiVisible] = useState(true);
   const [seccionAjustes, setSeccionAjustes] = useState<'cal' | 'int' | 'exp' | 'bg'>('cal');
+  const [mesAjusteFondo, setMesAjusteFondo] = useState(hoy.getMonth());
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -103,6 +104,13 @@ export default function Calendario() {
     cargarDatos();
   }, []);
 
+  // Sincronizar mesAjusteFondo con el mes actual del calendario cuando se abre el menú
+  useEffect(() => {
+    if (menuVisible) {
+      setMesAjusteFondo(mes);
+    }
+  }, [menuVisible]);
+
   const guardarConfig = async (nuevaConfig: any) => {
     try {
         const configActual = await AsyncStorage.getItem(STORAGE_KEY_CONFIG);
@@ -113,7 +121,6 @@ export default function Calendario() {
   };
 
   const seleccionarImagen = async () => {
-    // Pedir permiso solo en el momento de la acción
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (status !== 'granted') {
@@ -132,15 +139,19 @@ export default function Calendario() {
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      const nuevosFondos = { ...fondosPersonalizados, [mes]: uri };
+      const nuevosFondos = { ...fondosPersonalizados, [mesAjusteFondo]: uri };
       setFondosPersonalizados(nuevosFondos);
       await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
+      // Si el mes que estamos editando es el mes actual del calendario, se actualizará solo
+      if (mesAjusteFondo === mes) {
+        // La actualización ya es reactiva por el estado fondosPersonalizados
+      }
     }
   };
 
   const restaurarImagenOriginal = async () => {
     const nuevosFondos = { ...fondosPersonalizados };
-    delete nuevosFondos[mes];
+    delete nuevosFondos[mesAjusteFondo];
     setFondosPersonalizados(nuevosFondos);
     await AsyncStorage.setItem(STORAGE_KEY_FONDOS, JSON.stringify(nuevosFondos));
   };
@@ -161,6 +172,9 @@ export default function Calendario() {
   const mesAnterior = () => { if (mes === 0) { setMes(11); setAnio(anio-1); } else setMes(mes-1); };
   const mesSiguiente = () => { if (mes === 11) { setMes(0); setAnio(anio+1); } else setMes(mes+1); };
 
+  const mesAjusteAnterior = () => { if (mesAjusteFondo === 0) setMesAjusteFondo(11); else setMesAjusteFondo(mesAjusteFondo - 1); };
+  const mesAjusteSiguiente = () => { if (mesAjusteFondo === 11) setMesAjusteFondo(0); else setMesAjusteFondo(mesAjusteFondo + 1); };
+
   const celdas = [];
   for (let i = 0; i < primerDia; i++) celdas.push(null);
   for (let d = 1; d <= diasEnMes; d++) celdas.push(d);
@@ -168,6 +182,7 @@ export default function Calendario() {
   const fechaBTS = (d: number) => FECHAS_BTS.find(f => f.mes === mes && f.dia === d);
   
   const imagenFondoActual = fondosPersonalizados[mes] ? { uri: fondosPersonalizados[mes] } : IMAGENES_DEFAULT[mes];
+  const imagenPreviewAjuste = fondosPersonalizados[mesAjusteFondo] ? { uri: fondosPersonalizados[mesAjusteFondo] } : IMAGENES_DEFAULT[mesAjusteFondo];
   
   return (
     <View style={[s.container, { backgroundColor: t.background }]}>
@@ -338,16 +353,26 @@ export default function Calendario() {
                     {/* Sección de Fondos Personalizados */}
                     {seccionAjustes === 'bg' && (
                         <View style={s.bgSettings}>
-                            <Text style={s.bgInfoText}>Fondo de {MESES[mes]}</Text>
-                            <View style={s.bgPreviewContainer}>
-                                <Image source={imagenFondoActual} style={s.bgPreview} />
+                            <View style={s.bgMonthNav}>
+                                <TouchableOpacity onPress={mesAjusteAnterior} style={s.bgNavBtn}>
+                                    <Ionicons name="chevron-back" size={20} color="#fff" />
+                                </TouchableOpacity>
+                                <Text style={s.bgInfoText}>Mes: {MESES[mesAjusteFondo].toUpperCase()}</Text>
+                                <TouchableOpacity onPress={mesAjusteSiguiente} style={s.bgNavBtn}>
+                                    <Ionicons name="chevron-forward" size={20} color="#fff" />
+                                </TouchableOpacity>
                             </View>
+
+                            <View style={s.bgPreviewContainer}>
+                                <Image source={imagenPreviewAjuste} style={s.bgPreview} />
+                            </View>
+
                             <View style={s.bgActionRow}>
                                 <TouchableOpacity style={[s.bgActionBtn, { backgroundColor: colorCalendario }]} onPress={seleccionarImagen}>
                                     <Ionicons name="image-outline" size={18} color="#fff" />
                                     <Text style={s.bgActionBtnText}>CAMBIAR</Text>
                                 </TouchableOpacity>
-                                {fondosPersonalizados[mes] && (
+                                {fondosPersonalizados[mesAjusteFondo] && (
                                     <TouchableOpacity style={s.bgActionBtnRestore} onPress={restaurarImagenOriginal}>
                                         <Ionicons name="refresh-outline" size={18} color="#fff" />
                                         <Text style={s.bgActionBtnText}>ORIGINAL</Text>
@@ -455,10 +480,11 @@ const s = StyleSheet.create({
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 30 },
   colorCircle: { width: 45, height: 45, borderRadius: 22.5, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
   
-  // Fondos Settings
   bgSettings: { width: '100%', alignItems: 'center', marginBottom: 30 },
-  bgInfoText: { color: '#fff', fontSize: 14, fontWeight: '700', marginBottom: 15 },
-  bgPreviewContainer: { width: 120, height: 200, borderRadius: 15, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)', marginBottom: 20 },
+  bgMonthNav: { flexDirection: 'row', alignItems: 'center', gap: 20, marginBottom: 15 },
+  bgNavBtn: { padding: 5, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 10 },
+  bgInfoText: { color: '#fff', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  bgPreviewContainer: { width: 100, height: 160, borderRadius: 15, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)', marginBottom: 20 },
   bgPreview: { width: '100%', height: '100%' },
   bgActionRow: { flexDirection: 'row', gap: 15 },
   bgActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 15 },
