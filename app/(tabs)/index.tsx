@@ -254,7 +254,7 @@ export default function Calendario() {
         style={s.bgImage} 
         onError={() => { if (fondosPersonalizados[mes]) setFondoFallo({ ...fondoFallo, [mes]: true }); }}
       />
-      <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
+      <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', 'transparent']} style={s.overlay} />
       
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scrollContent, { paddingTop: insets.top + 5 }]}>
         {uiVisible && !modoSoloFoto && (
