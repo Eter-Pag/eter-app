@@ -75,3 +75,11 @@ Web Bundled 6499ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1
 Web Bundled 475ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
 Web Bundled 61ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
  LOG  [web] Logs will appear in the browser console
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 89ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 634ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 68ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console

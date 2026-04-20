@@ -442,7 +442,7 @@ const s = StyleSheet.create({
   container: { flex: 1 },
   bgImage: { position: 'absolute', width: width, height: height, resizeMode: 'cover' },
   overlay: { ...StyleSheet.absoluteFillObject },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 20, paddingBottom: 120 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   iconBtn: { padding: 5 },

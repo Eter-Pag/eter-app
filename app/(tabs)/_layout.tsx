@@ -20,7 +20,11 @@ export default function TabLayout() {
           position: 'absolute',
           borderTopWidth: 0,
           elevation: 0,
-          height: Platform.OS === 'ios' ? 88 : 65,
+          height: Platform.OS === 'ios' ? 95 : 85,
+          paddingBottom: Platform.OS === 'ios' ? 30 : 20,
+          bottom: Platform.OS === 'ios' ? 0 : 10,
+          marginHorizontal: Platform.OS === 'ios' ? 0 : 15,
+          borderRadius: Platform.OS === 'ios' ? 0 : 25,
           backgroundColor: 'transparent',
         },
         tabBarBackground: () => (
@@ -36,7 +40,7 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '700',
-          marginBottom: Platform.OS === 'ios' ? -5 : 10,
+          marginBottom: Platform.OS === 'ios' ? 0 : 5,
           letterSpacing: 0.5,
         },
         tabBarIconStyle: {
