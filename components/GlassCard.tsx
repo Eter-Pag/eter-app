@@ -52,6 +52,5 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     width: '100%',
-    height: '100%',
   },
 });
