@@ -264,15 +264,12 @@ export default function Calendario() {
                   <TouchableOpacity 
                     style={s.iconBtn} 
                     onPress={() => router.push('/modal')}
-                    activeOpacity={0.7}
                   >
-                     <View pointerEvents="none">
-                       {perfil?.foto ? (
-                         <Image source={{ uri: perfil.foto }} style={s.miniFoto} />
-                       ) : (
-                         <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
-                       )}
-                     </View>
+                     {perfil?.foto ? (
+                       <Image source={{ uri: perfil.foto }} style={s.miniFoto} />
+                     ) : (
+                       <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
+                     )}
                   </TouchableOpacity>
               </View>
             </Animated.View>
@@ -453,7 +450,7 @@ const s = StyleSheet.create({
   celda: { width: (width - 100) / 7, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20, zIndex: 1000 },
   modalContainer: { width: '100%', maxWidth: 450 },
   modalBottomContainer: { width: '100%', maxWidth: 400, position: 'absolute', bottom: 40 },
   modalCard: { padding: 25, alignItems: 'center' },
