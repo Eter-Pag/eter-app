@@ -93,8 +93,13 @@ export default function TabTwoScreen() {
                 style={styles.touchable}
               >
                 <GlassCard style={styles.card} intensity={40} noPadding>
-                  <Image source={tool.image} style={styles.cardImage} contentFit="cover" />
-                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={styles.cardOverlay} />
+                  <Image 
+                    source={tool.image} 
+                    style={styles.cardImage} 
+                    contentFit="cover"
+                    contentPosition="center"
+                  />
+                  <LinearGradient colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.85)']} style={styles.cardOverlay} />
                   <View style={styles.cardContent}>
                     <View style={[styles.iconContainer, { backgroundColor: tool.color + '50' }]}>
                       <Ionicons name={tool.icon as any} size={22} color={tool.color} />
@@ -139,8 +144,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   cardImage: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.85,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.9,
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,
