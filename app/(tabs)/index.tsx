@@ -368,20 +368,24 @@ export default function Calendario() {
                 <GlassCard style={s.modalCard} intensity={80}>
                     <Text style={s.modalTitle}>PERSONALIZACIÓN</Text>
                     
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.tabsScroll}>
-                        <TouchableOpacity onPress={() => setSeccionAjustes('cal')} style={s.tab}>
-                            <Text style={[s.tabText, seccionAjustes === 'cal' && { color: '#fff' }]}>CALENDARIO</Text>
+                    <View style={s.tabsVertical}>
+                        <TouchableOpacity onPress={() => setSeccionAjustes('cal')} style={[s.tabVertical, seccionAjustes === 'cal' && { backgroundColor: colorCalendario + '44', borderColor: colorCalendario }]}>
+                            <Ionicons name="calendar-outline" size={18} color={seccionAjustes === 'cal' ? '#fff' : colorInterfaz + '88'} />
+                            <Text style={[s.tabTextVertical, seccionAjustes === 'cal' && { color: '#fff' }]}>CALENDARIO</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setSeccionAjustes('int')} style={s.tab}>
-                            <Text style={[s.tabText, seccionAjustes === 'int' && { color: '#fff' }]}>INTERFAZ</Text>
+                        <TouchableOpacity onPress={() => setSeccionAjustes('int')} style={[s.tabVertical, seccionAjustes === 'int' && { backgroundColor: colorCalendario + '44', borderColor: colorCalendario }]}>
+                            <Ionicons name="color-palette-outline" size={18} color={seccionAjustes === 'int' ? '#fff' : colorInterfaz + '88'} />
+                            <Text style={[s.tabTextVertical, seccionAjustes === 'int' && { color: '#fff' }]}>INTERFAZ</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setSeccionAjustes('exp')} style={s.tab}>
-                            <Text style={[s.tabText, seccionAjustes === 'exp' && { color: '#fff' }]}>EXPLORE</Text>
+                        <TouchableOpacity onPress={() => setSeccionAjustes('exp')} style={[s.tabVertical, seccionAjustes === 'exp' && { backgroundColor: colorCalendario + '44', borderColor: colorCalendario }]}>
+                            <Ionicons name="globe-outline" size={18} color={seccionAjustes === 'exp' ? '#fff' : colorInterfaz + '88'} />
+                            <Text style={[s.tabTextVertical, seccionAjustes === 'exp' && { color: '#fff' }]}>ETER WEB</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setSeccionAjustes('bg')} style={s.tab}>
-                            <Text style={[s.tabText, seccionAjustes === 'bg' && { color: '#fff' }]}>FONDOS</Text>
+                        <TouchableOpacity onPress={() => setSeccionAjustes('bg')} style={[s.tabVertical, seccionAjustes === 'bg' && { backgroundColor: colorCalendario + '44', borderColor: colorCalendario }]}>
+                            <Ionicons name="image-outline" size={18} color={seccionAjustes === 'bg' ? '#fff' : colorInterfaz + '88'} />
+                            <Text style={[s.tabTextVertical, seccionAjustes === 'bg' && { color: '#fff' }]}>FONDOS</Text>
                         </TouchableOpacity>
-                    </ScrollView>
+                    </View>
 
                     {seccionAjustes !== 'bg' ? (
                         <View style={s.colorGrid}>
@@ -502,9 +506,9 @@ const s = StyleSheet.create({
   modalCard: { padding: 25, alignItems: 'center' },
   modalTitle: { fontSize: 22, fontWeight: '900', color: '#fff', marginBottom: 15, letterSpacing: 2 },
   modalSub: { fontSize: 14, color: 'rgba(255,255,255,0.6)', fontWeight: '700', marginBottom: 20 },
-  tabsScroll: { width: '100%', marginBottom: 25 },
-  tab: { paddingVertical: 8, paddingHorizontal: 15 },
-  tabText: { fontSize: 11, fontWeight: '900', color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5 },
+  tabsVertical: { width: '100%', flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 25, justifyContent: 'center' },
+  tabVertical: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)' },
+  tabTextVertical: { fontSize: 10, fontWeight: '900', color: 'rgba(255,255,255,0.5)', letterSpacing: 0.5 },
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginBottom: 30 },
   colorCircle: { width: 45, height: 45, borderRadius: 22.5, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)' },
   bgSettings: { width: '100%', alignItems: 'center', marginBottom: 30 },
