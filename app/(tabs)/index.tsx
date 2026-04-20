@@ -222,12 +222,21 @@ export default function Calendario() {
                   <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
                      <Ionicons name="settings-outline" size={24} color={colorInterfaz} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={s.iconBtn} onPress={() => router.push('/modal')}>
-                     {perfil?.foto ? (
-                       <Image source={{ uri: perfil.foto }} style={s.miniFoto} />
-                     ) : (
-                       <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
-                     )}
+                  <TouchableOpacity 
+                    style={s.iconBtn} 
+                    onPress={() => {
+                      console.log('Navegando al perfil...');
+                      router.push('/modal');
+                    }}
+                    activeOpacity={0.7}
+                  >
+                     <View pointerEvents="none">
+                       {perfil?.foto ? (
+                         <Image source={{ uri: perfil.foto }} style={s.miniFoto} />
+                       ) : (
+                         <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
+                       )}
+                     </View>
                   </TouchableOpacity>
               </View>
             </Animated.View>
