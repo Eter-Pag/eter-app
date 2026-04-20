@@ -76,7 +76,7 @@ export default function TabTwoScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View entering={FadeInDown.duration(800)}>
-          <Text style={[styles.title, { color: colorExplore }]}>EXPLORE</Text>
+          <Text style={[styles.title, { color: colorExplore }]}>ETER WEB</Text>
           <Text style={[styles.subtitle, { color: colorInterfaz + '99' }]}>EterKpop MX Universe</Text>
         </Animated.View>
 
@@ -123,16 +123,16 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 15,
     justifyContent: 'space-between',
+    paddingHorizontal: 2,
   },
   cardWrapper: {
-    width: (width - 55) / 2,
-    marginBottom: 10,
+    width: (width - 60) / 2,
+    marginBottom: 20,
   },
   touchable: {
     width: '100%',
-    height: 180,
+    height: 200,
   },
   card: {
     flex: 1,
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     ...StyleSheet.absoluteFillObject,
-    opacity: 0.7,
+    opacity: 0.85,
   },
   cardOverlay: {
     ...StyleSheet.absoluteFillObject,

@@ -69,9 +69,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'EXPLORE',
+          title: 'ETER WEB',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={24} color={color} />
+            <Ionicons name={focused ? 'globe' : 'globe-outline'} size={24} color={color} />
           ),
         }}
       />
