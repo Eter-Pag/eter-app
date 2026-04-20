@@ -283,14 +283,6 @@ export default function Calendario() {
 
             <WeatherWidget />
 
-            <TouchableOpacity 
-              style={[s.verFotoBtn, { backgroundColor: colorCalendario + '30' }]} 
-              onPress={() => setModoSoloFoto(true)}
-            >
-              <Ionicons name="image-outline" size={18} color={colorInterfaz} />
-              <Text style={[s.verFotoText, { color: colorInterfaz }]}>VER FOTO</Text>
-            </TouchableOpacity>
-
             <Animated.View entering={FadeInDown.delay(200).duration(800)} style={{ marginTop: 60 }}>
               <GlassCard style={s.calendarCard} intensity={25}>
                 <View style={s.navRow}>
@@ -333,6 +325,14 @@ export default function Calendario() {
                   })}
                 </View>
               </GlassCard>
+
+              <TouchableOpacity 
+                style={[s.verFotoBtn, { backgroundColor: colorCalendario + '30' }]} 
+                onPress={() => setModoSoloFoto(true)}
+              >
+                <Ionicons name="image-outline" size={18} color={colorInterfaz} />
+                <Text style={[s.verFotoText, { color: colorInterfaz }]}>VER FOTO</Text>
+              </TouchableOpacity>
             </Animated.View>
           </Animated.View>
         )}
