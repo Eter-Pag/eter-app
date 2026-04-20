@@ -1,0 +1,124 @@
+Starting project at /home/ubuntu/eter-app
+React Compiler enabled
+Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.
+Starting Metro Bundler
+The following packages should be updated for best compatibility with the installed expo version:
+  expo-image-picker@55.0.18 - expected version: ~17.0.10
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 49.0% ( 67/221)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓░░░░░░░░ 52.0% (380/527)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 49.0% (348/544)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 62.6% (675/853)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 63.4% (699/878)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 87.5% ( 972/1039)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 94.8% (1305/1340)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 97.2% (1250/1268)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 14593ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1283 modules)
+λ Bundled 11407ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+λ Bundled 11323ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+λ Bundled 3555ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+λ Bundled 1818ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.6% (1354/1357)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web Bundled 18519ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1357 modules)
+Error: Premature close
+    at onclose (node:internal/streams/end-of-stream:158:30)
+    at processTicksAndRejections (node:internal/process/task_queues:85:11)
+Web Bundled 15223ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 15092ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 7328ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 5597ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Error: Premature close
+    at onclose (node:internal/streams/end-of-stream:158:30)
+    at processTicksAndRejections (node:internal/process/task_queues:85:11)
+Error: Premature close
+    at onclose (node:internal/streams/end-of-stream:158:30)
+    at processTicksAndRejections (node:internal/process/task_queues:85:11)
+λ Bundled 53ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 480ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓░░░░░░░░░░ 42.8% (503/772)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 94.9% (1311/1346)
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Web Bundled 6693ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1358 modules)
+Web Bundled 6097ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 49ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 466ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 56ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
+Web node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+λ Bundled 97ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 640ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+λ Bundled 70ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 549ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+λ Bundled 43ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/node/render.js (1 module)
+[expo-notifications] Listening to push token changes is not yet fully supported on web. Adding a listener will have no effect.
+"shadow*" style props are deprecated. Use "boxShadow".
+λ  WARN  Image: style.resizeMode is deprecated. Please use props.resizeMode. 
+λ  WARN  props.pointerEvents is deprecated. Use style.pointerEvents 
+Web Bundled 501ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+Web Bundled 54ms node_modules/.pnpm/expo-router@6.0.23_@expo+metro-runtime@6.1.2_@types+react@19.1.17_expo-constants@18.0.1_412f9e654c8df7bbba9bd08dc26d8309/node_modules/expo-router/entry.js (1 module)
+ LOG  [web] Logs will appear in the browser console
