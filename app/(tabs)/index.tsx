@@ -489,7 +489,7 @@ const s = StyleSheet.create({
   celda: { width: (width - 100) / 7, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
-  soloFotoContainer: { height: height * 0.7, justifyContent: 'center', alignItems: 'center' },
+  soloFotoContainer: { height: height * 0.8, justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 60 },
   soloFotoNav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10 },
   soloFotoNavBtn: { padding: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 30 },
   soloFotoInfo: { alignItems: 'center' },
