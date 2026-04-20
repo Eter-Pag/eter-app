@@ -97,6 +97,7 @@ export default function Calendario() {
   const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
   const [nuevoEventoTexto, setNuevoEventoTexto] = useState('');
   const [uiVisible, setUiVisible] = useState(true);
+  const [modoSoloFoto, setModoSoloFoto] = useState(false);
   const [seccionAjustes, setSeccionAjustes] = useState<'cal' | 'int' | 'exp' | 'bg'>('cal');
   const [mesAjusteFondo, setMesAjusteFondo] = useState(hoy.getMonth());
 
@@ -256,7 +257,7 @@ export default function Calendario() {
       <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)', t.background]} style={s.overlay} />
       
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scrollContent, { paddingTop: insets.top + 5 }]}>
-        {uiVisible && (
+        {uiVisible && !modoSoloFoto && (
           <Animated.View entering={FadeIn.duration(600)} exiting={FadeOut.duration(400)}>
             <Animated.View entering={FadeInDown.duration(800)} style={s.header}>
               <View>
@@ -264,10 +265,7 @@ export default function Calendario() {
                 <Text style={[s.koreanText, { color: colorInterfaz + 'CC' }]}>방탄소년단 • 2026 Edition</Text>
               </View>
               <View style={s.headerBtns}>
-                  <TouchableOpacity 
-                    style={s.iconBtn} 
-                    onPress={() => setMenuVisible(true)}
-                  >
+                  <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
                      <Ionicons name="settings-outline" size={24} color={colorInterfaz} />
                   </TouchableOpacity>
                   <TouchableOpacity 
@@ -284,6 +282,14 @@ export default function Calendario() {
             </Animated.View>
 
             <WeatherWidget />
+
+            <TouchableOpacity 
+              style={[s.verFotoBtn, { backgroundColor: colorCalendario + '30' }]} 
+              onPress={() => setModoSoloFoto(true)}
+            >
+              <Ionicons name="image-outline" size={18} color={colorInterfaz} />
+              <Text style={[s.verFotoText, { color: colorInterfaz }]}>VER FOTO</Text>
+            </TouchableOpacity>
 
             <Animated.View entering={FadeInDown.delay(200).duration(800)} style={{ marginTop: 60 }}>
               <GlassCard style={s.calendarCard} intensity={25}>
@@ -328,6 +334,28 @@ export default function Calendario() {
                 </View>
               </GlassCard>
             </Animated.View>
+          </Animated.View>
+        )}
+
+        {modoSoloFoto && (
+          <Animated.View entering={FadeIn.duration(500)} style={s.soloFotoContainer}>
+            <View style={s.soloFotoNav}>
+              <TouchableOpacity onPress={mesAnterior} style={s.soloFotoNavBtn}>
+                <Ionicons name="chevron-back" size={32} color="#fff" />
+              </TouchableOpacity>
+              <View style={s.soloFotoInfo}>
+                <Text style={s.soloFotoMes}>{MESES[mes].toUpperCase()}</Text>
+                <TouchableOpacity 
+                  style={s.volverBtn} 
+                  onPress={() => setModoSoloFoto(false)}
+                >
+                  <Text style={s.volverBtnText}>VER CALENDARIO</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={mesSiguiente} style={s.soloFotoNavBtn}>
+                <Ionicons name="chevron-forward" size={32} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </Animated.View>
         )}
       </ScrollView>
@@ -449,6 +477,8 @@ const s = StyleSheet.create({
   miniFoto: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: '#fff' },
   titleText: { fontSize: 28, fontWeight: '900', letterSpacing: 2 },
   koreanText: { fontSize: 14, fontWeight: '600' },
+  verFotoBtn: { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 15, borderRadius: 20, marginTop: 10, gap: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  verFotoText: { fontSize: 12, fontWeight: '800', letterSpacing: 1 },
   calendarCard: { marginBottom: 20, paddingVertical: 15, alignSelf: 'center', width: '100%' },
   navRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingHorizontal: 10 },
   navBtn: { padding: 5 },
@@ -459,6 +489,13 @@ const s = StyleSheet.create({
   celda: { width: (width - 100) / 7, height: 38, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   diaNum: { fontSize: 15 },
   btsIndicator: { width: 4, height: 4, borderRadius: 2, marginTop: 2 },
+  soloFotoContainer: { height: height * 0.7, justifyContent: 'center', alignItems: 'center' },
+  soloFotoNav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingHorizontal: 10 },
+  soloFotoNavBtn: { padding: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 30 },
+  soloFotoInfo: { alignItems: 'center' },
+  soloFotoMes: { color: '#fff', fontSize: 24, fontWeight: '900', letterSpacing: 3, textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 5, marginBottom: 10 },
+  volverBtn: { backgroundColor: 'rgba(255,255,255,0.2)', paddingVertical: 8, paddingHorizontal: 15, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  volverBtnText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20, zIndex: 1000 },
   modalContainer: { width: '100%', maxWidth: 450 },
   modalBottomContainer: { width: '100%', maxWidth: 400, position: 'absolute', bottom: 40 },
