@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Dimensions, Platform, Modal, TextInput, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
@@ -69,6 +70,7 @@ const COLORES_PALETA = [
 ];
 
 export default function Calendario() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const systemColorScheme = useColorScheme() ?? 'dark';
   const t = Colors[systemColorScheme];
@@ -302,9 +304,9 @@ export default function Calendario() {
                   <TouchableOpacity style={s.iconBtn} onPress={() => setMenuVisible(true)}>
                      <Ionicons name="settings-outline" size={24} color={colorInterfaz} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={s.iconBtn}>
-                     <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
-                  </TouchableOpacity>
+                  <TouchableOpacity style={s.iconBtn} onPress={() => router.push('/modal')}>
+	                     <Ionicons name="person-circle-outline" size={32} color={colorInterfaz} />
+	                  </TouchableOpacity>
               </View>
             </Animated.View>
 
