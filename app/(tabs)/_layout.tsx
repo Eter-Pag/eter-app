@@ -30,11 +30,10 @@ export default function TabLayout() {
         tabBarBackground: () => (
           <View style={styles.tabBarBackground}>
             <BlurView
-              intensity={40}
-              tint="dark"
+              intensity={30}
+              tint={colorScheme === 'dark' ? 'dark' : 'light'}
               style={StyleSheet.absoluteFill}
             />
-            <View style={[styles.tabBarBorder, { backgroundColor: t.glassBorder }]} />
           </View>
         ),
         tabBarLabelStyle: {
@@ -83,13 +82,9 @@ const styles = StyleSheet.create({
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
-    backgroundColor: 'rgba(20, 20, 35, 0.6)',
-  },
-  tabBarBorder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
 });
