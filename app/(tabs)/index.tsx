@@ -149,7 +149,10 @@ export default function Calendario() {
 
     await Notifications.scheduleNotificationAsync({
       content: { title: "¡Recordatorio BTS Calendar! 💜", body: texto, data: { dia, mes } },
-      trigger: { date: fechaEvento },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: fechaEvento,
+      } as any,
     });
   };
 
