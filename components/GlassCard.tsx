@@ -16,13 +16,13 @@ export function GlassCard({ children, style, intensity = 30, noPadding = false }
   const t = Colors[colorScheme];
 
   return (
-    <View style={[styles.container, { borderColor: t.glassBorder }, style]}>
+    <View style={[styles.container, style]}>
       <BlurView
         intensity={intensity}
         tint={colorScheme === 'dark' ? 'dark' : 'light'}
         style={StyleSheet.absoluteFill}
       />
-      <View style={[styles.content, noPadding && { padding: 0 }, { backgroundColor: t.cardBackground }]}>
+      <View style={[styles.content, noPadding && { padding: 0 }]}>
         {children}
       </View>
     </View>
@@ -32,22 +32,10 @@ export function GlassCard({ children, style, intensity = 30, noPadding = false }
 const styles = StyleSheet.create({
   container: {
     borderRadius: 24,
-    borderWidth: 1,
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 4,
-      },
-      web: {
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      }
-    }),
+    backgroundColor: 'rgba(255, 255, 255, 0.05)', // Un fondo mínimo para dar consistencia
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)', // Un solo borde muy fino
   },
   content: {
     padding: 16,
