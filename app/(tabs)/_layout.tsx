@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)', // 30-35% negro para mejor contraste
   },
 });
